@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import logo from "@/assets/logo.png";
+import Logo from "@/components/Logo";
 
 interface NavbarProps {
   onExplore: () => void;
@@ -9,10 +9,8 @@ interface NavbarProps {
 const Navbar = ({ onExplore, onList }: NavbarProps) => {
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-md">
-      <div className="container mx-auto flex items-center justify-between py-4">
-        <div className="flex items-center gap-2">
-          <img src={logo} alt="CreatorsBNB" className="h-10 w-auto" />
-        </div>
+      <div className="container mx-auto flex items-center justify-between py-3">
+        <Logo size="sm" />
 
         <nav className="hidden items-center gap-8 md:flex">
           <button onClick={onExplore} className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">Explore</button>
