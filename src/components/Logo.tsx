@@ -9,74 +9,108 @@ interface LogoProps {
 }
 
 const sizes = {
-  sm: { icon: 28, text: "text-lg", tagline: "text-[8px]", gap: "gap-1.5" },
-  md: { icon: 36, text: "text-xl", tagline: "text-[9px]", gap: "gap-2" },
-  lg: { icon: 52, text: "text-3xl", tagline: "text-xs", gap: "gap-2.5" },
-  xl: { icon: 72, text: "text-5xl", tagline: "text-sm", gap: "gap-3" },
+  sm: { icon: 32, text: "text-lg", tagline: "text-[8px]", gap: "gap-1.5" },
+  md: { icon: 40, text: "text-xl", tagline: "text-[9px]", gap: "gap-2" },
+  lg: { icon: 56, text: "text-3xl", tagline: "text-xs", gap: "gap-2.5" },
+  xl: { icon: 80, text: "text-5xl", tagline: "text-sm", gap: "gap-3" },
 };
 
-const InfinityIcon = ({ size = 36, id = "main" }: { size?: number; id?: string }) => {
-  const gradId = `infinityGrad_${id}`;
-  const shadowId = `infinityShadow_${id}`;
+/**
+ * CreatorsBNB Infinity Logo
+ * Left loop = "C" (open on the right side, like the letter C)
+ * Right loop = "B" (closed with a bump/indentation creating two bowls)
+ * Smooth continuous stroke with gradient from blue→cyan→amber→orange
+ */
+const InfinityIcon = ({ size = 40, id = "main" }: { size?: number; id?: string }) => {
+  const gradId = `cbGrad_${id}`;
+  const shadowId = `cbShadow_${id}`;
+  const w = size;
+  const h = size * 0.6;
+
   return (
     <svg
-      width={size}
-      height={size * 0.55}
-      viewBox="0 0 200 110"
+      width={w}
+      height={h}
+      viewBox="0 0 240 144"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       aria-label="CreatorsBNB logo"
     >
       <defs>
-        <linearGradient id={gradId} x1="0%" y1="30%" x2="100%" y2="70%">
+        <linearGradient id={gradId} x1="0%" y1="50%" x2="100%" y2="50%">
           <stop offset="0%" stopColor="#3B82F6" />
-          <stop offset="35%" stopColor="#22D3EE" />
-          <stop offset="65%" stopColor="#F59E0B" />
+          <stop offset="30%" stopColor="#22D3EE" />
+          <stop offset="55%" stopColor="#6DD8A0" />
+          <stop offset="75%" stopColor="#F5A623" />
           <stop offset="100%" stopColor="#F97316" />
         </linearGradient>
-        <filter id={shadowId} x="-10%" y="-10%" width="120%" height="120%">
-          <feDropShadow dx="0" dy="1" stdDeviation="2" floodColor="#3B82F6" floodOpacity="0.15" />
+        <filter id={shadowId} x="-8%" y="-8%" width="116%" height="116%">
+          <feDropShadow dx="0" dy="2" stdDeviation="3" floodColor="#3B82F6" floodOpacity="0.12" />
         </filter>
       </defs>
-      {/* 
-        Left loop = C shape, Right loop = B shape
-        The infinity is drawn so the left half reads as "C" and the right half as "B"
-      */}
+
       <g filter={`url(#${shadowId})`}>
-        {/* Left loop — C shape: open on the right, curving left */}
+        {/*
+          The "C" — left loop:
+          An open curve that clearly reads as the letter C.
+          It starts from the center crossing, sweeps left forming a C-shape
+          (open gap on the right side of the left loop).
+        */}
         <path
-          d="M100 55
-             C100 55 92 20 60 20
-             C28 20 14 38 14 55
-             C14 72 28 90 60 90
-             C92 90 100 55 100 55"
+          d="
+            M120 72
+            C106 42, 70 16, 48 20
+            C22 24, 12 46, 12 72
+            C12 98, 22 120, 48 124
+            C70 128, 106 102, 120 72
+          "
           stroke={`url(#${gradId})`}
-          strokeWidth="10"
+          strokeWidth="12"
           strokeLinecap="round"
           strokeLinejoin="round"
           fill="none"
         />
-        {/* Right loop — B shape: has a slight bump/indent to suggest B */}
+
+        {/*
+          The "B" — right loop:
+          A figure that reads as B — has two bumps on the right side.
+          The vertical spine on the left, with two curved bowls.
+        */}
+        {/* Upper bowl of B */}
         <path
-          d="M100 55
-             C100 55 108 20 140 20
-             C172 20 186 38 186 55
-             C186 72 172 90 140 90
-             C108 90 100 55 100 55"
+          d="
+            M120 72
+            C130 50, 148 28, 168 28
+            C192 28, 200 44, 200 56
+            C200 66, 194 72, 182 72
+          "
           stroke={`url(#${gradId})`}
-          strokeWidth="10"
+          strokeWidth="12"
           strokeLinecap="round"
           strokeLinejoin="round"
           fill="none"
         />
-        {/* Subtle B detail — a small indentation on the right loop's outer edge */}
+        {/* Lower bowl of B */}
         <path
-          d="M168 55 C168 50 172 47 176 50"
+          d="
+            M182 72
+            C196 72, 204 80, 204 90
+            C204 104, 194 116, 168 116
+            C148 116, 130 94, 120 72
+          "
           stroke={`url(#${gradId})`}
-          strokeWidth="3"
+          strokeWidth="12"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          fill="none"
+        />
+        {/* B spine — subtle vertical line connecting the two bowls at the center meeting point */}
+        <path
+          d="M182 72 L182 72"
+          stroke={`url(#${gradId})`}
+          strokeWidth="12"
           strokeLinecap="round"
           fill="none"
-          opacity="0.5"
         />
       </g>
     </svg>
@@ -115,7 +149,7 @@ const Logo = ({
             "tracking-[0.22em] text-muted-foreground mt-0.5 ml-1 font-medium"
           )}
         >
-          Create · Book · Collaborate
+          Create · Book · Collaborate · ∞
         </p>
       )}
     </div>

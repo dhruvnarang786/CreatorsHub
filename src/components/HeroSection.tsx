@@ -1,6 +1,5 @@
-import { Sparkles, Play } from "lucide-react";
+import { Sparkles, Play, Star, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import Logo from "@/components/Logo";
 import modernLoft from "@/assets/modern-loft.jpg";
 import podcastStudio from "@/assets/podcast-studio.jpg";
 import videoStudio from "@/assets/video-studio.jpg";
@@ -12,13 +11,13 @@ interface HeroSectionProps {
 const HeroSection = ({ onExplore }: HeroSectionProps) => {
   return (
     <section className="relative overflow-hidden min-h-[600px]">
-      {/* Gradient background matching reference image */}
+      {/* Gradient background */}
       <div className="absolute inset-0 bg-gradient-to-br from-[#e8eaf6] via-[#fce4c8] to-[#c5d8f6]" />
-      {/* Sparkle / light effects */}
+      {/* Soft light orbs */}
       <div className="absolute top-[20%] left-[30%] h-[300px] w-[300px] rounded-full bg-white/30 blur-3xl pointer-events-none" />
       <div className="absolute bottom-[10%] right-[20%] h-[250px] w-[250px] rounded-full bg-[#F97316]/10 blur-3xl pointer-events-none" />
       <div className="absolute top-[10%] right-[40%] h-[200px] w-[200px] rounded-full bg-[#3B82F6]/10 blur-3xl pointer-events-none" />
-      {/* Small sparkle dots */}
+      {/* Sparkle dots */}
       <div className="absolute top-[30%] left-[50%] h-1 w-1 rounded-full bg-white shadow-[0_0_6px_2px_rgba(255,255,255,0.8)] pointer-events-none" />
       <div className="absolute top-[50%] left-[35%] h-1.5 w-1.5 rounded-full bg-white shadow-[0_0_8px_3px_rgba(255,255,255,0.7)] pointer-events-none" />
       <div className="absolute top-[15%] right-[25%] h-1 w-1 rounded-full bg-white shadow-[0_0_6px_2px_rgba(255,255,255,0.8)] pointer-events-none" />
@@ -72,78 +71,95 @@ const HeroSection = ({ onExplore }: HeroSectionProps) => {
             </div>
           </div>
 
-          {/* Right side - floating card mockups like the reference */}
-          <div className="relative hidden min-h-[460px] lg:block">
-            {/* Main website mockup card */}
-            <div className="absolute right-4 top-0 w-[320px] rounded-2xl border border-white/60 bg-white/80 backdrop-blur-md shadow-xl overflow-hidden">
-              {/* Mini navbar */}
-              <div className="flex items-center justify-between px-4 py-2 border-b border-border/40">
-                <Logo size="sm" />
-                <div className="flex items-center gap-2">
-                  <span className="text-[9px] text-muted-foreground">Listings</span>
-                  <span className="text-[9px] text-muted-foreground">How it Works</span>
-                  <span className="text-[9px] text-muted-foreground">Contact</span>
-                  <span className="text-[8px] bg-primary text-primary-foreground px-2 py-0.5 rounded-full font-medium">Sign Up</span>
-                </div>
+          {/* Right side — structured layered card composition */}
+          <div className="relative hidden min-h-[480px] lg:flex items-center justify-center">
+            {/* Main featured card — largest, center */}
+            <div className="relative z-20 w-[300px] rounded-2xl border border-white/60 bg-white/90 backdrop-blur-md shadow-[0_8px_32px_rgba(0,0,0,0.1)] overflow-hidden">
+              <div className="h-[200px] overflow-hidden">
+                <img
+                  src={modernLoft}
+                  alt="Modern Creative Loft"
+                  className="h-full w-full object-cover"
+                  loading="lazy"
+                  width={600}
+                  height={400}
+                />
               </div>
-              {/* Mini hero content */}
               <div className="p-4">
-                <p className="text-xs font-bold text-foreground leading-snug">
-                  Unlock Amazing{" "}
-                  <span className="text-[#F97316]">Spaces</span>
-                  <br />for Creators
-                </p>
-                <p className="text-[8px] text-muted-foreground mt-1">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                </p>
-                <div className="flex gap-1 mt-2">
-                  <span className="text-[7px] bg-primary text-primary-foreground px-2 py-0.5 rounded-full font-medium">Search</span>
-                  <span className="text-[7px] bg-accent text-accent-foreground px-2 py-0.5 rounded-full">Search Rooms</span>
+                <div className="flex items-center justify-between">
+                  <h4 className="text-sm font-semibold text-foreground">Modern Creative Loft</h4>
+                  <div className="flex items-center gap-0.5">
+                    <Star className="h-3 w-3 fill-[#F59E0B] text-[#F59E0B]" />
+                    <span className="text-xs font-medium text-foreground">4.9</span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1 mt-1">
+                  <MapPin className="h-3 w-3 text-muted-foreground" />
+                  <span className="text-xs text-muted-foreground">Los Angeles, CA</span>
+                </div>
+                <div className="mt-3 flex items-center justify-between">
+                  <span className="text-sm font-bold text-foreground">$120<span className="text-xs font-normal text-muted-foreground">/night</span></span>
+                  <span className="text-[10px] bg-[#3B82F6]/10 text-[#3B82F6] px-2 py-0.5 rounded-full font-medium">Featured</span>
                 </div>
               </div>
             </div>
 
-            {/* Top right floating listing card */}
-            <div className="absolute right-[-10px] top-[-10px] w-[180px] rounded-xl border border-white/60 bg-white/90 backdrop-blur-md shadow-lg overflow-hidden rotate-3">
-              <img src={modernLoft} alt="Studio by the Beach" className="h-20 w-full object-cover" />
-              <div className="p-2">
-                <div className="text-[10px] font-semibold text-foreground">Studio by the Beach</div>
-                <div className="flex items-center gap-1 mt-0.5">
-                  <span className="text-[9px] text-[#F59E0B]">★★★★</span>
-                  <span className="text-[8px] text-muted-foreground">$120/hr</span>
+            {/* Top-left supporting card — smaller, overlapping */}
+            <div className="absolute z-30 top-4 left-0 w-[200px] rounded-xl border border-white/60 bg-white/90 backdrop-blur-md shadow-[0_6px_24px_rgba(0,0,0,0.08)] overflow-hidden -rotate-3">
+              <div className="h-[110px] overflow-hidden">
+                <img
+                  src={podcastStudio}
+                  alt="Podcast Studio"
+                  className="h-full w-full object-cover"
+                  loading="lazy"
+                  width={400}
+                  height={220}
+                />
+              </div>
+              <div className="p-3">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-xs">🎙️</span>
+                  <span className="text-xs font-semibold text-foreground">Podcast Studio</span>
+                </div>
+                <div className="flex items-center justify-between mt-1.5">
+                  <span className="text-xs font-bold text-foreground">$80<span className="text-[10px] font-normal text-muted-foreground">/hr</span></span>
+                  <div className="flex items-center gap-0.5">
+                    <Star className="h-2.5 w-2.5 fill-[#F59E0B] text-[#F59E0B]" />
+                    <span className="text-[10px] font-medium text-foreground">4.8</span>
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Podcast room card - bottom left */}
-            <div className="absolute bottom-20 left-0 w-[220px] rounded-xl border border-white/60 bg-white/90 backdrop-blur-md shadow-lg overflow-hidden -rotate-2">
-              <div className="flex items-center gap-2 p-2 border-b border-border/30">
-                <span className="text-[10px]">🎙️</span>
-                <span className="text-[10px] font-medium text-foreground">Podcast Room</span>
+            {/* Bottom-right supporting card — smaller, overlapping */}
+            <div className="absolute z-30 bottom-4 right-0 w-[210px] rounded-xl border border-white/60 bg-white/90 backdrop-blur-md shadow-[0_6px_24px_rgba(0,0,0,0.08)] overflow-hidden rotate-2">
+              <div className="h-[120px] overflow-hidden">
+                <img
+                  src={videoStudio}
+                  alt="Video Production Studio"
+                  className="h-full w-full object-cover"
+                  loading="lazy"
+                  width={420}
+                  height={240}
+                />
               </div>
-              <img src={podcastStudio} alt="Podcast Room" className="h-28 w-full object-cover" />
-              <div className="p-2 flex items-center gap-1">
-                <span className="inline-block h-4 w-4 rounded-full bg-accent" />
-                <span className="text-[9px] font-medium text-foreground">Podcast Room</span>
+              <div className="p-3">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-xs">🎬</span>
+                  <span className="text-xs font-semibold text-foreground">Video Studio</span>
+                </div>
+                <div className="flex items-center justify-between mt-1.5">
+                  <span className="text-xs font-bold text-foreground">$150<span className="text-[10px] font-normal text-muted-foreground">/hr</span></span>
+                  <div className="flex items-center gap-0.5">
+                    <Star className="h-2.5 w-2.5 fill-[#F59E0B] text-[#F59E0B]" />
+                    <span className="text-[10px] font-medium text-foreground">4.7</span>
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Video Studio card - bottom right */}
-            <div className="absolute bottom-0 right-0 w-[200px] rounded-xl border border-white/60 bg-white/90 backdrop-blur-md shadow-lg overflow-hidden rotate-1">
-              <img src={videoStudio} alt="Video Studio" className="h-28 w-full object-cover" />
-              <div className="flex items-center gap-2 px-3 py-2">
-                <span className="text-[10px]">🎬</span>
-                <span className="text-[10px] font-semibold text-foreground">Video Studio</span>
-              </div>
-            </div>
-
-            {/* Sunny Mountain Loft mini card */}
-            <div className="absolute top-16 right-[-20px] w-[130px] rounded-lg border border-white/60 bg-white/80 backdrop-blur-md shadow-md p-2 rotate-2">
-              <div className="h-14 rounded bg-accent overflow-hidden">
-                <img src={modernLoft} alt="Sunny Mountain Loft" className="h-full w-full object-cover" />
-              </div>
-              <div className="mt-1 text-[8px] font-medium text-foreground">Sunny Mountain Loft</div>
-            </div>
+            {/* Subtle depth layer behind main card */}
+            <div className="absolute z-10 w-[280px] h-[320px] rounded-2xl bg-white/40 backdrop-blur-sm border border-white/30 shadow-[0_4px_16px_rgba(0,0,0,0.04)] translate-x-4 translate-y-3" />
           </div>
         </div>
       </div>
