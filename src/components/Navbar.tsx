@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import logo from "@/assets/logo.png";
 
 interface NavbarProps {
   onExplore: () => void;
@@ -9,14 +10,8 @@ const Navbar = ({ onExplore, onList }: NavbarProps) => {
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-md">
       <div className="container mx-auto flex items-center justify-between py-4">
-        <div className="flex items-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-orange-400 text-sm font-extrabold text-primary-foreground">
-            CB
-          </div>
-          <div>
-            <h1 className="text-lg font-bold leading-tight tracking-tight text-foreground">CreatorsBNB</h1>
-            <p className="text-xs text-muted-foreground">Find Your Creative Space</p>
-          </div>
+        <div className="flex items-center gap-2">
+          <img src={logo} alt="CreatorsBNB" className="h-10 w-auto" />
         </div>
 
         <nav className="hidden items-center gap-8 md:flex">
