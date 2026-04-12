@@ -1,14 +1,11 @@
 import { useState } from "react";
 import { ArrowRight, Star } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import modernLoft from "@/assets/modern-loft.jpg";
 import podcastStudio from "@/assets/podcast-studio.jpg";
 import artWorkshop from "@/assets/art-workshop.jpg";
 import videoStudio from "@/assets/video-studio.jpg";
 import type { CategoryKey } from "@/lib/data";
-
-interface FeaturedSpacesProps {
-  onExplore: () => void;
-}
 
 const tabs: { label: string; key: CategoryKey }[] = [
   { label: "Studios", key: "studios" },
@@ -24,11 +21,12 @@ const spaces = [
   { title: "Video Studio", price: "$180/hour", image: videoStudio, rating: 4.7, location: "Miami, FL", badge: "Popular" },
 ];
 
-const FeaturedSpaces = ({ onExplore }: FeaturedSpacesProps) => {
+const FeaturedSpaces = () => {
   const [activeTab, setActiveTab] = useState<CategoryKey>("studios");
+  const navigate = useNavigate();
 
   return (
-    <section className="bg-gradient-to-b from-transparent to-[#f5f0ea]/40 py-12 md:py-16">
+    <section className="py-14 md:py-18">
       <div className="container mx-auto">
         <div className="text-center mb-6">
           <h2 className="text-2xl font-bold tracking-tight text-foreground md:text-3xl italic">
@@ -53,7 +51,10 @@ const FeaturedSpaces = ({ onExplore }: FeaturedSpacesProps) => {
               </button>
             ))}
           </div>
-          <button onClick={onExplore} className="flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+          <button
+            onClick={() => navigate(`/category/${activeTab}`)}
+            className="flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+          >
             View all <ArrowRight className="h-3.5 w-3.5" />
           </button>
         </div>
@@ -61,14 +62,24 @@ const FeaturedSpaces = ({ onExplore }: FeaturedSpacesProps) => {
         {/* Cards */}
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {spaces.map((space) => (
-            <div key={space.title} className="group cursor-pointer overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md">
+            <div
+              key={space.title}
+              className="group cursor-pointer overflow-hidden rounded-2xl border border-border/60 bg-card/80 backdrop-blur-sm shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:scale-[1.02]"
+            >
               <div className="relative h-44 overflow-hidden">
-                <img src={space.image} alt={space.title} className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" loading="lazy" width={640} height={512} />
-                <span className={`absolute top-3 left-3 text-[10px] font-semibold px-2.5 py-1 rounded-full ${
-                  space.badge === "Top Rated"
-                    ? "bg-green-500 text-white"
-                    : "bg-[#F97316] text-white"
-                }`}>
+                <img
+                  src={space.image}
+                  alt={space.title}
+                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  loading="lazy"
+                />
+                <span
+                  className={`absolute top-3 left-3 text-[10px] font-semibold px-2.5 py-1 rounded-full ${
+                    space.badge === "Top Rated"
+                      ? "bg-green-500 text-white"
+                      : "bg-[hsl(24,95%,53%)] text-white"
+                  }`}
+                >
                   {space.badge}
                 </span>
               </div>
