@@ -1,10 +1,8 @@
 import { useState } from "react";
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
-import FeaturedSpaces from "@/components/FeaturedSpaces";
-import HowItWorks from "@/components/HowItWorks";
 import CategoryCards from "@/components/CategoryCards";
-import FeaturesSection from "@/components/FeaturesSection";
+import FeaturedSpaces from "@/components/FeaturedSpaces";
 import MarketplacePage from "@/components/MarketplacePage";
 import RegistrationPage from "@/components/RegistrationPage";
 import type { CategoryKey } from "@/lib/data";
@@ -45,10 +43,8 @@ const Index = () => {
     <div className="min-h-screen">
       <Navbar onExplore={() => openMarketplace("studios")} onList={() => openRegistration("list-studio")} />
       <HeroSection onExplore={() => openMarketplace("studios")} />
-      <FeaturedSpaces onExplore={() => openMarketplace("studios")} />
-      <HowItWorks />
       <CategoryCards onCategory={openMarketplace} onRegister={openRegistration} />
-      <FeaturesSection />
+      <FeaturedSpaces onExplore={() => openMarketplace("studios")} />
     </div>
   );
 };
