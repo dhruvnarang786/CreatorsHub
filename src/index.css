@@ -1,8 +1,39 @@
+@import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=Manrope:wght@200..800&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+/* ═══ FIX: Global pointer-events — overlays must NEVER block clicks ═══ */
+.grain-overlay,
+.grain-overlay::before,
+.grain-overlay::after,
+[class*="blob"],
+[class*="overlay"],
+[class*="glow"],
+[class*="noise"],
+[class*="grain"],
+.dot-grid,
+.pulsing-glow {
+  pointer-events: none !important;
+}
+
+a, button, input, select, textarea,
+[role="button"], [role="link"],
+[onclick], .clickable,
+nav, nav * {
+  pointer-events: all !important;
+  position: relative;
+}
+
+/* Native Cursor — clean default behavior */
+* { cursor: default; }
+a, button, [role="button"], .clickable,
+select, label, summary,
+[tabindex]:not([tabindex="-1"]) { cursor: pointer; }
+input[type="text"], input[type="email"], input[type="password"],
+input[type="search"], input[type="url"], input[type="tel"],
+input[type="number"], input[type="date"], input[type="time"],
+textarea { cursor: text; }
 
 @layer base {
   :root {
@@ -15,11 +46,11 @@
     --popover: 0 0% 100%;
     --popover-foreground: 225 25% 16%;
 
-    --primary: 24 95% 53%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 264 75% 52%;
+    --primary-foreground: 270 100% 97%;
 
-    --secondary: 220 20% 96%;
-    --secondary-foreground: 225 25% 16%;
+    --secondary: 189 100% 23%;
+    --secondary-foreground: 189 100% 93%;
 
     --muted: 220 20% 96%;
     --muted-foreground: 220 10% 46%;
@@ -27,19 +58,16 @@
     --accent: 230 25% 95%;
     --accent-foreground: 225 25% 16%;
 
-    --destructive: 0 84.2% 60.2%;
+    --destructive: 348 80% 39%;
     --destructive-foreground: 0 0% 100%;
 
     --border: 220 15% 91%;
     --input: 220 15% 91%;
-    --ring: 24 95% 53%;
+    --ring: 264 75% 52%;
 
     --radius: 0.75rem;
 
-    --hero-bg: 230 30% 97%;
-    --gradient-orange: linear-gradient(135deg, hsl(24, 100%, 55%), hsl(36, 100%, 55%));
-    --shadow-card: 0 1px 3px hsl(220 15% 91% / 0.6), 0 4px 16px hsl(220 15% 91% / 0.3);
-    --shadow-card-hover: 0 4px 12px hsl(220 15% 91% / 0.5), 0 8px 32px hsl(220 15% 91% / 0.3);
+    --hero-bg: 0 0% 96%;
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -48,7 +76,7 @@
     --sidebar-accent: 240 4.8% 95.9%;
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 24 95% 53%;
+    --sidebar-ring: 264 75% 52%;
   }
 }
 
@@ -58,7 +86,118 @@
   }
 
   body {
-    @apply bg-background text-foreground font-sans antialiased;
-    font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Manrope', ui-sans-serif, system-ui, -apple-system, sans-serif;
+    scroll-behavior: smooth;
   }
+}
+
+/* ─── Neon Homepage Styles ─── */
+
+.font-newsreader {
+  font-family: "Newsreader", serif;
+}
+
+.neon-gradient-text {
+  background: linear-gradient(to right, #702ae1, #006576, #b00d6a);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.neon-pulse-shadow:hover {
+  box-shadow: 0 0 25px rgba(112, 42, 225, 0.4);
+}
+
+.grain-overlay {
+  opacity: 0.03;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+}
+
+.dot-grid {
+  background-image: radial-gradient(rgba(124, 58, 237, 0.1) 1.5px, transparent 1.5px);
+  background-size: 24px 24px;
+}
+
+.pulsing-glow {
+  animation: neonPulse 2s infinite alternate;
+}
+
+@keyframes neonPulse {
+  from { box-shadow: 0 0 10px rgba(112, 42, 225, 0.3); }
+  to { box-shadow: 0 0 25px rgba(112, 42, 225, 0.6); }
+}
+
+/* Logo Shimmer */
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+.logo-shimmer:hover {
+  background: linear-gradient(90deg, #0A0A1A 0%, #702ae1 50%, #0A0A1A 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer 1.5s linear infinite;
+}
+
+/* Carousel Styles */
+.carousel-container {
+  position: relative;
+  width: 600px;
+  height: 450px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform-style: preserve-3d;
+}
+
+.carousel-card {
+  position: absolute;
+  border-radius: 8px 48px 8px 48px;
+  transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+.card-center {
+  width: 280px;
+  height: 420px;
+  z-index: 30;
+  opacity: 1;
+  transform: translateX(0) scale(1);
+  border: 2px solid #702ae1;
+  box-shadow: 0 0 30px rgba(112, 42, 225, 0.4);
+}
+
+.card-side {
+  width: 220px;
+  height: 330px;
+  z-index: 20;
+  opacity: 0.5;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.card-left {
+  transform: translateX(-180px) scale(0.85);
+}
+
+.card-right {
+  transform: translateX(180px) scale(0.85);
+}
+
+/* Dropdown */
+.dropdown:hover .dropdown-menu {
+  display: flex;
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.dropdown-menu {
+  transform: translateY(10px);
+  transition: all 0.3s ease;
+  pointer-events: none;
 }
