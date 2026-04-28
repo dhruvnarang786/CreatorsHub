@@ -1,6 +1,8 @@
 import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, MapPin, Loader2, SlidersHorizontal } from "lucide-react";
+import { ArrowLeft, MapPin, Loader2, SlidersHorizontal, Search } from "lucide-react";
+import * as SliderPrimitive from "@radix-ui/react-slider";
+import { Calendar } from "@/components/ui/calendar";
 import { getStudios } from "@/services/supabase-service";
 import { supabase } from "@/lib/supabase";
 
@@ -11,23 +13,12 @@ const PLACEHOLDER_STUDIOS = [
   { id: "p3", name: "Reel Factory Set", city: "Bengaluru", type: "Short-form Studio", price_per_hour: 2500, description: "Made for reels, ad shoots, and performance content.", created_at: new Date().toISOString(), is_available: true },
 ];
 
-const defaultFilters = {
-  sortBy: "relevant",
-  city: "all",
-  types: [] as string[],
-  minPrice: "",
-  maxPrice: "",
-  availableNow: false,
-};
-
 const sortOptions = [
   { value: 'relevant', label: 'Most Relevant' },
   { value: 'price_low', label: 'Price: Low to High' },
   { value: 'price_high', label: 'Price: High to Low' },
-  { value: 'trending', label: 'Trending First' },
   { value: 'newest', label: 'Newest First' },
   { value: 'az', label: 'A–Z Alphabetically' },
-  { value: 'za', label: 'Z–A Alphabetically' },
   { value: 'rating', label: 'Highest Rated' },
 ];
 
@@ -44,12 +35,34 @@ const StudioMarketplace = () => {
   const navigate = useNavigate();
   const [studios, setStudios] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
   const [cities, setCities] = useState<string[]>([]);
 
-  const [draftFilters, setDraftFilters] = useState(defaultFilters);
-  const [appliedFilters, setAppliedFilters] = useState(defaultFilters);
+  // Draft states (form UI)
+  const [whereInput, setWhereInput] = useState("");
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>();
+  const [whenMode, setWhenMode] = useState<"dates" | "flexible">("dates");
+  const [flexibleDay, setFlexibleDay] = useState("Any");
+  
+  const [draftPrice, setDraftPrice] = useState([0, 10000]);
+  const [draftTypes, setDraftTypes] = useState<string[]>([]);
+  const [draftSort, setDraftSort] = useState("relevant");
+  const [draftAvailable, setDraftAvailable] = useState(false);
+
+  // Applied states (controls the grid)
+  const [appliedCity, setAppliedCity] = useState("");
+  const [appliedDate, setAppliedDate] = useState<Date | undefined>();
+  const [appliedPrice, setAppliedPrice] = useState([0, 10000]);
+  const [appliedTypes, setAppliedTypes] = useState<string[]>([]);
+  const [appliedSort, setAppliedSort] = useState("relevant");
+  const [appliedAvailable, setAppliedAvailable] = useState(false);
+
+  // Dropdown states
+  const [isWhereOpen, setIsWhereOpen] = useState(false);
+  const [isWhenOpen, setIsWhenOpen] = useState(false);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+
+  const whereRef = useRef<HTMLDivElement>(null);
+  const whenRef = useRef<HTMLDivElement>(null);
   const filterRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -76,75 +89,80 @@ const StudioMarketplace = () => {
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (filterRef.current && !filterRef.current.contains(event.target as Node)) {
-        setIsFilterOpen(false);
-      }
+      const target = event.target as Node;
+      if (whereRef.current && !whereRef.current.contains(target)) setIsWhereOpen(false);
+      if (whenRef.current && !whenRef.current.contains(target)) setIsWhenOpen(false);
+      if (filterRef.current && !filterRef.current.contains(target)) setIsFilterOpen(false);
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  useEffect(() => {
-    if (isFilterOpen) {
-      setDraftFilters(appliedFilters);
-    }
-  }, [isFilterOpen, appliedFilters]);
+  const handleApply = () => {
+    setAppliedCity(whereInput);
+    setAppliedDate(selectedDate);
+    setAppliedPrice(draftPrice);
+    setAppliedTypes(draftTypes);
+    setAppliedSort(draftSort);
+    setAppliedAvailable(draftAvailable);
+    setIsWhereOpen(false);
+    setIsWhenOpen(false);
+    setIsFilterOpen(false);
+  };
 
-  const applyFiltersLogic = (studiosList: any[]) => {
+  const handleClearAll = () => {
+    setWhereInput("");
+    setSelectedDate(undefined);
+    setWhenMode("dates");
+    setFlexibleDay("Any");
+    setDraftPrice([0, 10000]);
+    setDraftTypes([]);
+    setDraftSort("relevant");
+    setDraftAvailable(false);
+    
+    setAppliedCity("");
+    setAppliedDate(undefined);
+    setAppliedPrice([0, 10000]);
+    setAppliedTypes([]);
+    setAppliedSort("relevant");
+    setAppliedAvailable(false);
+  };
+
+  const filterAndSortStudios = (studiosList: any[]) => {
     let result = [...studiosList];
 
-    // Filter by search text
-    if (search) {
-      result = result.filter(s => {
-        const hay = [s.name, s.city, s.type, s.description].join(" ").toLowerCase();
-        return hay.includes(search.toLowerCase());
-      });
+    if (appliedCity) {
+      result = result.filter(s => (s.city || "").toLowerCase().includes(appliedCity.toLowerCase()));
+    }
+    if (appliedDate) {
+      result = result.filter(s => s.is_available === true);
+    }
+    result = result.filter(s => {
+      const p = s.price_per_hour || 0;
+      return p >= appliedPrice[0] && p <= appliedPrice[1];
+    });
+    if (appliedTypes.length > 0) {
+      result = result.filter(s => appliedTypes.includes(s.type));
+    }
+    if (appliedAvailable) {
+      result = result.filter(s => s.is_available === true);
     }
 
-    // Filter by city
-    if (appliedFilters.city !== 'all') {
-      result = result.filter(s => s.city === appliedFilters.city);
-    }
-
-    // Filter by type (if any selected)
-    if (appliedFilters.types.length > 0) {
-      result = result.filter(s => appliedFilters.types.includes(s.type));
-    }
-
-    // Filter by price range
-    if (appliedFilters.minPrice) result = result.filter(s => (s.price_per_hour || 0) >= parseFloat(appliedFilters.minPrice));
-    if (appliedFilters.maxPrice) result = result.filter(s => (s.price_per_hour || 0) <= parseFloat(appliedFilters.maxPrice));
-
-    // Filter available now
-    if (appliedFilters.availableNow) result = result.filter(s => s.is_available === true);
-
-    // Sort
-    switch(appliedFilters.sortBy) {
-      case 'price_low': 
-        result.sort((a,b) => (a.price_per_hour || 0) - (b.price_per_hour || 0)); break;
-      case 'price_high': 
-        result.sort((a,b) => (b.price_per_hour || 0) - (a.price_per_hour || 0)); break;
-      case 'newest': 
-        result.sort((a,b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()); break;
-      case 'az': 
-        result.sort((a,b) => (a.name || "").localeCompare(b.name || "")); break;
-      case 'za': 
-        result.sort((a,b) => (b.name || "").localeCompare(a.name || "")); break;
+    switch(appliedSort) {
+      case 'price_low': result.sort((a,b) => (a.price_per_hour || 0) - (b.price_per_hour || 0)); break;
+      case 'price_high': result.sort((a,b) => (b.price_per_hour || 0) - (a.price_per_hour || 0)); break;
+      case 'newest': result.sort((a,b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()); break;
+      case 'az': result.sort((a,b) => (a.name || "").localeCompare(b.name || "")); break;
       default: break;
     }
 
     return result;
   };
 
-  const filtered = applyFiltersLogic(studios);
+  const filtered = filterAndSortStudios(studios);
+  const filteredCities = cities.filter(c => c.toLowerCase().includes(whereInput.toLowerCase()));
 
-  let activeCount = 0;
-  if (appliedFilters.sortBy !== "relevant") activeCount++;
-  if (appliedFilters.city !== "all") activeCount++;
-  activeCount += appliedFilters.types.length;
-  if (appliedFilters.minPrice) activeCount++;
-  if (appliedFilters.maxPrice) activeCount++;
-  if (appliedFilters.availableNow) activeCount++;
+  const activeFilterCount = (appliedPrice[0] > 0 || appliedPrice[1] < 10000 ? 1 : 0) + appliedTypes.length + (appliedAvailable ? 1 : 0) + (appliedSort !== 'relevant' ? 1 : 0);
 
   return (
     <div className="min-h-screen bg-[#F8F8FC] relative overflow-hidden" style={{ fontFamily: '"Manrope", sans-serif' }}>
@@ -160,163 +178,255 @@ const StudioMarketplace = () => {
       </nav>
 
       <div className="relative z-10 max-w-7xl mx-auto px-6 py-10">
-        <button onClick={() => navigate("/")} className="mb-6 flex items-center gap-2 text-sm text-[#9CA3AF] hover:text-[#0A0A1A] transition-colors">
-          <ArrowLeft className="h-4 w-4" /> Back to Home
-        </button>
+        
+        {/* Airbnb-style Search Bar & Filter */}
+        <div className="flex items-center justify-center mb-16 relative z-40">
+          <div className="flex items-center gap-4 w-full max-w-4xl">
+            
+            {/* Search Pill */}
+            <div className="flex-1 flex bg-white rounded-full border border-[#E5E7EB] shadow-[0_4px_20px_rgba(0,0,0,0.10)] relative">
+              
+              {/* WHERE Section */}
+              <div className="flex-1 relative" ref={whereRef}>
+                <button 
+                  className="w-full text-left px-6 py-4 hover:bg-gray-50 rounded-l-full transition-colors flex flex-col items-start"
+                  onClick={() => { setIsWhereOpen(true); setIsWhenOpen(false); setIsFilterOpen(false); }}
+                >
+                  <span className="text-[12px] font-bold text-[#0A0A1A]">Where</span>
+                  <input 
+                    value={whereInput}
+                    onChange={(e) => { setWhereInput(e.target.value); setIsWhereOpen(true); }}
+                    placeholder="Search cities..."
+                    className="bg-transparent text-sm text-[#0A0A1A] placeholder:text-[#9CA3AF] outline-none w-full mt-0.5"
+                  />
+                </button>
+                {isWhereOpen && (
+                  <div className="absolute top-full left-0 mt-4 w-[360px] bg-white rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.12)] border border-[rgba(124,58,237,0.12)] py-4 z-50">
+                    <p className="text-xs text-[#9CA3AF] font-bold mb-3 px-6">Suggested Cities</p>
+                    <div className="max-h-60 overflow-y-auto px-4">
+                      {filteredCities.length > 0 ? filteredCities.map(c => (
+                        <div 
+                          key={c}
+                          onClick={() => { 
+                            setWhereInput(c); 
+                            setAppliedCity(c); // User spec: "filters studios by that city"
+                            setIsWhereOpen(false); 
+                            setIsWhenOpen(true); 
+                          }}
+                          className="flex items-center gap-4 p-3 rounded-xl hover:bg-gray-50 cursor-pointer transition-colors"
+                        >
+                          <div className="w-12 h-12 rounded-[12px] bg-[rgba(124,58,237,0.08)] flex items-center justify-center text-[#7C3AED]">
+                            <MapPin className="h-5 w-5" />
+                          </div>
+                          <div>
+                            <div className="text-[#0A0A1A] font-medium text-[15px]">{c}</div>
+                            <div className="text-[#6B7280] text-xs">Studios available</div>
+                          </div>
+                        </div>
+                      )) : (
+                        <div className="text-sm text-[#6B7280] p-3 text-center">No cities found</div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
 
+              <div className="w-px bg-[#E5E7EB] my-3" />
+
+              {/* WHEN Section */}
+              <div className="flex-1 relative" ref={whenRef}>
+                <button 
+                  className="w-full text-left px-6 py-4 hover:bg-gray-50 transition-colors flex flex-col items-start"
+                  onClick={() => { setIsWhenOpen(true); setIsWhereOpen(false); setIsFilterOpen(false); }}
+                >
+                  <span className="text-[12px] font-bold text-[#0A0A1A]">When</span>
+                  <span className={`text-sm mt-0.5 ${selectedDate ? 'text-[#0A0A1A]' : 'text-[#9CA3AF]'}`}>
+                    {selectedDate ? selectedDate.toLocaleDateString() : 'Add dates'}
+                  </span>
+                </button>
+                {isWhenOpen && (
+                  <div className="absolute top-full left-1/2 -translate-x-1/2 mt-4 bg-white rounded-3xl shadow-[0_20px_60px_rgba(0,0,0,0.12)] border border-[rgba(124,58,237,0.12)] p-6 z-50">
+                    <div className="flex justify-center mb-6">
+                      <div className="flex bg-gray-100 p-1 rounded-full">
+                        <button className={`px-5 py-1.5 rounded-full text-sm font-bold transition-all ${whenMode === 'dates' ? 'bg-white shadow text-[#0A0A1A]' : 'text-[#6B7280]'}`} onClick={() => setWhenMode('dates')}>Dates</button>
+                        <button className={`px-5 py-1.5 rounded-full text-sm font-bold transition-all ${whenMode === 'flexible' ? 'bg-white shadow text-[#0A0A1A]' : 'text-[#6B7280]'}`} onClick={() => setWhenMode('flexible')}>Flexible</button>
+                      </div>
+                    </div>
+                    {whenMode === 'dates' ? (
+                      <div className="w-[600px] flex justify-center">
+                        <Calendar 
+                          mode="single" 
+                          selected={selectedDate} 
+                          onSelect={(d) => { setSelectedDate(d); setIsWhenOpen(false); handleApply(); }}
+                          numberOfMonths={2}
+                          disabled={(date) => date < new Date(new Date().setHours(0,0,0,0))}
+                          classNames={{
+                            day_selected: "bg-[#7C3AED] text-white hover:bg-[#7C3AED] hover:text-white focus:bg-[#7C3AED] focus:text-white",
+                            day_today: "font-bold underline text-[#7C3AED]"
+                          }}
+                        />
+                      </div>
+                    ) : (
+                      <div className="w-[400px]">
+                        <p className="text-sm font-bold text-[#0A0A1A] mb-4 text-center">How long?</p>
+                        <div className="grid grid-cols-4 gap-3">
+                          {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun", "Any"].map(day => (
+                            <button 
+                              key={day}
+                              onClick={() => { setFlexibleDay(day); setIsWhenOpen(false); handleApply(); }}
+                              className={`py-3 rounded-xl border text-sm font-bold transition-all ${flexibleDay === day ? 'border-[#7C3AED] bg-[rgba(124,58,237,0.05)] text-[#7C3AED]' : 'border-[#E5E7EB] text-[#374151] hover:border-[#7C3AED]'}`}
+                            >
+                              {day}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* SEARCH Button */}
+              <div className="pr-2 py-2 flex items-center">
+                <button 
+                  onClick={handleApply}
+                  className="h-12 px-6 rounded-full bg-gradient-to-r from-[#7C3AED] to-[#06B6D4] text-white flex items-center justify-center font-bold gap-2 hover:shadow-[0_0_20px_rgba(124,58,237,0.30)] transition-all"
+                >
+                  <Search className="h-4 w-4 text-white font-bold" />
+                  Search
+                </button>
+              </div>
+            </div>
+
+            {/* SEPARATE FILTER BUTTON */}
+            <div className="relative" ref={filterRef}>
+              <button 
+                onClick={() => { setIsFilterOpen(!isFilterOpen); setIsWhereOpen(false); setIsWhenOpen(false); }}
+                className={`h-[60px] flex items-center gap-2 px-6 rounded-full border-[1.5px] transition-all text-[15px] font-bold ${
+                  activeFilterCount > 0 
+                    ? 'bg-[#7C3AED] border-[#7C3AED] text-white' 
+                    : 'bg-white border-[#E5E7EB] text-[#0A0A1A] hover:border-[#7C3AED] hover:text-[#7C3AED]'
+                }`}
+              >
+                <SlidersHorizontal className="h-5 w-5" />
+                {activeFilterCount > 0 ? `Filters (${activeFilterCount})` : "Filters"}
+              </button>
+
+              {isFilterOpen && (
+                <div className="absolute top-full right-0 mt-4 w-[380px] bg-white rounded-[20px] shadow-[0_20px_60px_rgba(0,0,0,0.12)] border border-[rgba(124,58,237,0.12)] p-7 z-50 space-y-7">
+                  
+                  {/* Price Range */}
+                  <div>
+                    <h4 className="text-sm font-bold text-[#0A0A1A]">Price Range</h4>
+                    <p className="text-[#6B7280] text-sm mb-5">₹0 — ₹10,000 per hour</p>
+                    <SliderPrimitive.Root
+                      className="relative flex w-full touch-none select-none items-center"
+                      value={draftPrice}
+                      min={0}
+                      max={10000}
+                      step={100}
+                      onValueChange={setDraftPrice}
+                    >
+                      <SliderPrimitive.Track className="relative h-2 w-full grow overflow-hidden rounded-full bg-[#E5E7EB]">
+                        <SliderPrimitive.Range className="absolute h-full bg-[#7C3AED]" />
+                      </SliderPrimitive.Track>
+                      <SliderPrimitive.Thumb className="block h-6 w-6 rounded-full border-2 border-white shadow bg-[#7C3AED] transition-transform hover:scale-110 focus-visible:outline-none" />
+                      <SliderPrimitive.Thumb className="block h-6 w-6 rounded-full border-2 border-white shadow bg-[#7C3AED] transition-transform hover:scale-110 focus-visible:outline-none" />
+                    </SliderPrimitive.Root>
+                    <div className="mt-4 text-center font-bold text-[#7C3AED]">
+                      ₹{draftPrice[0]} — ₹{draftPrice[1]}
+                    </div>
+                  </div>
+
+                  <div className="h-px bg-[#F3F4F6] w-full" />
+
+                  {/* Studio Type */}
+                  <div>
+                    <h4 className="text-sm font-bold text-[#0A0A1A] mb-4">Studio Type</h4>
+                    <div className="space-y-3">
+                      {typeOptions.map(type => (
+                        <label key={type} className="flex items-center gap-3 cursor-pointer group">
+                          <input 
+                            type="checkbox"
+                            checked={draftTypes.includes(type)}
+                            onChange={e => {
+                              const types = e.target.checked 
+                                ? [...draftTypes, type] 
+                                : draftTypes.filter(t => t !== type);
+                              setDraftTypes(types);
+                            }}
+                            className="w-5 h-5 rounded-[4px] border-[#E5E7EB] text-[#7C3AED] focus:ring-[#7C3AED] accent-[#7C3AED] cursor-pointer"
+                          />
+                          <span className="text-[15px] text-[#0A0A1A] group-hover:text-[#7C3AED] transition-colors">{type}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="h-px bg-[#F3F4F6] w-full" />
+
+                  {/* Sort By */}
+                  <div>
+                    <h4 className="text-sm font-bold text-[#0A0A1A] mb-4">Sort By</h4>
+                    <div className="space-y-3">
+                      {sortOptions.map(opt => (
+                        <label key={opt.value} className="flex items-center gap-3 cursor-pointer group">
+                          <input 
+                            type="radio" 
+                            name="sortBy" 
+                            checked={draftSort === opt.value}
+                            onChange={() => setDraftSort(opt.value)}
+                            className="w-5 h-5 text-[#7C3AED] border-[#E5E7EB] focus:ring-[#7C3AED] accent-[#7C3AED] cursor-pointer"
+                          />
+                          <span className="text-[15px] text-[#0A0A1A] group-hover:text-[#7C3AED] transition-colors">{opt.label}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="h-px bg-[#F3F4F6] w-full" />
+
+                  {/* Availability */}
+                  <div>
+                    <label className="flex items-center gap-3 cursor-pointer group">
+                      <input 
+                        type="checkbox"
+                        checked={draftAvailable}
+                        onChange={e => setDraftAvailable(e.target.checked)}
+                        className="w-5 h-5 rounded-[4px] border-[#E5E7EB] text-[#7C3AED] focus:ring-[#7C3AED] accent-[#7C3AED] cursor-pointer"
+                      />
+                      <span className="text-[15px] font-bold text-[#0A0A1A] group-hover:text-[#7C3AED] transition-colors">Available Now only</span>
+                    </label>
+                  </div>
+
+                  {/* Bottom Actions */}
+                  <div className="flex items-center justify-between pt-4">
+                    <button 
+                      onClick={handleClearAll}
+                      className="text-[15px] font-bold text-[#7C3AED] hover:text-[#0A0A1A] transition-colors bg-transparent border-none outline-none"
+                    >
+                      Clear All
+                    </button>
+                    <button 
+                      onClick={handleApply}
+                      className="px-6 py-3 rounded-full bg-gradient-to-r from-[#7C3AED] to-[#06B6D4] text-white text-[15px] font-bold shadow-md hover:scale-[1.02] transition-transform"
+                    >
+                      Show Results
+                    </button>
+                  </div>
+
+                </div>
+              )}
+            </div>
+
+          </div>
+        </div>
+
+        {/* Header (after Search Bar) */}
         <div className="mb-8">
           <p className="text-[11px] font-black uppercase tracking-[2px] text-[#7C3AED] mb-2">Marketplace</p>
           <h1 className="text-4xl md:text-5xl font-bold text-[#0A0A1A]" style={{ fontFamily: '"Newsreader", serif' }}>Studio <span className="italic">Marketplace</span></h1>
           <p className="text-[#6B7280] mt-2">Browse available studio spaces, compare setups, and request a booking.</p>
-        </div>
-
-        {/* Search & Filter Button */}
-        <div className="flex gap-4 mb-6 relative z-40">
-          <input 
-            value={search} 
-            onChange={(e) => setSearch(e.target.value)} 
-            placeholder="Search by keyword..." 
-            className="flex-1 rounded-[10px] bg-white border-[1.5px] border-[#E5E7EB] px-4 py-3 text-sm text-[#0A0A1A] outline-none placeholder:text-[#9CA3AF] focus:border-[#7C3AED] focus:shadow-[0_0_0_3px_rgba(124,58,237,0.10)] transition-all"
-          />
-          <div className="relative" ref={filterRef}>
-            <button 
-              onClick={() => setIsFilterOpen(!isFilterOpen)}
-              className={`flex items-center gap-2 px-5 py-3 rounded-[10px] border-[1.5px] transition-all text-sm font-bold ${
-                activeCount > 0 
-                  ? 'bg-[#7C3AED] border-[#7C3AED] text-white' 
-                  : 'bg-white border-[#E5E7EB] text-[#374151] hover:border-[#7C3AED] hover:text-[#7C3AED]'
-              }`}
-            >
-              <SlidersHorizontal className="h-4 w-4" />
-              {activeCount > 0 ? `Filters (${activeCount})` : "Filter & Sort"}
-            </button>
-
-            {isFilterOpen && (
-              <div className="absolute right-0 top-full mt-2 w-[320px] bg-white border border-[rgba(124,58,237,0.12)] rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.12)] p-6 z-50 space-y-6">
-                
-                {/* Section 1 - Sort By */}
-                <div>
-                  <h4 className="text-[11px] font-bold tracking-wide uppercase text-[#374151] mb-3">Sort By</h4>
-                  <div className="space-y-2.5">
-                    {sortOptions.map(opt => (
-                      <label key={opt.value} className="flex items-center gap-3 cursor-pointer group">
-                        <input 
-                          type="radio" 
-                          name="sortBy" 
-                          checked={draftFilters.sortBy === opt.value}
-                          onChange={() => setDraftFilters(p => ({ ...p, sortBy: opt.value }))}
-                          className="w-4 h-4 text-[#7C3AED] border-[#E5E7EB] focus:ring-[#7C3AED] accent-[#7C3AED] cursor-pointer"
-                        />
-                        <span className="text-sm text-[#0A0A1A] group-hover:text-[#7C3AED] transition-colors">{opt.label}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="h-px bg-[#F3F4F6] w-full" />
-
-                {/* Section 2 - City */}
-                <div>
-                  <h4 className="text-[11px] font-bold tracking-wide uppercase text-[#374151] mb-3">Filter by City</h4>
-                  <select 
-                    value={draftFilters.city}
-                    onChange={e => setDraftFilters(p => ({ ...p, city: e.target.value }))}
-                    className="w-full rounded-[8px] bg-white border-[1.5px] border-[#E5E7EB] px-3 py-2.5 text-sm text-[#0A0A1A] outline-none focus:border-[#7C3AED] transition-colors cursor-pointer"
-                  >
-                    <option value="all">All Cities</option>
-                    {cities.map(c => <option key={c} value={c}>{c}</option>)}
-                  </select>
-                </div>
-
-                <div className="h-px bg-[#F3F4F6] w-full" />
-
-                {/* Section 3 - Type */}
-                <div>
-                  <h4 className="text-[11px] font-bold tracking-wide uppercase text-[#374151] mb-3">Filter by Type</h4>
-                  <div className="space-y-2.5">
-                    {typeOptions.map(type => (
-                      <label key={type} className="flex items-center gap-3 cursor-pointer group">
-                        <input 
-                          type="checkbox"
-                          checked={draftFilters.types.includes(type)}
-                          onChange={e => {
-                            const types = e.target.checked 
-                              ? [...draftFilters.types, type] 
-                              : draftFilters.types.filter(t => t !== type);
-                            setDraftFilters(p => ({ ...p, types }));
-                          }}
-                          className="w-4 h-4 rounded-[4px] border-[#E5E7EB] text-[#7C3AED] focus:ring-[#7C3AED] accent-[#7C3AED] cursor-pointer"
-                        />
-                        <span className="text-sm text-[#0A0A1A] group-hover:text-[#7C3AED] transition-colors">{type}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="h-px bg-[#F3F4F6] w-full" />
-
-                {/* Section 4 - Price */}
-                <div>
-                  <h4 className="text-[11px] font-bold tracking-wide uppercase text-[#374151] mb-3">Price Range</h4>
-                  <div className="flex gap-3">
-                    <input 
-                      type="number" 
-                      placeholder="Min ₹" 
-                      value={draftFilters.minPrice}
-                      onChange={e => setDraftFilters(p => ({ ...p, minPrice: e.target.value }))}
-                      className="w-full rounded-[8px] bg-white border-[1.5px] border-[#E5E7EB] px-3 py-2 text-sm text-[#0A0A1A] outline-none focus:border-[#7C3AED] transition-colors"
-                    />
-                    <input 
-                      type="number" 
-                      placeholder="Max ₹" 
-                      value={draftFilters.maxPrice}
-                      onChange={e => setDraftFilters(p => ({ ...p, maxPrice: e.target.value }))}
-                      className="w-full rounded-[8px] bg-white border-[1.5px] border-[#E5E7EB] px-3 py-2 text-sm text-[#0A0A1A] outline-none focus:border-[#7C3AED] transition-colors"
-                    />
-                  </div>
-                </div>
-
-                <div className="h-px bg-[#F3F4F6] w-full" />
-
-                {/* Section 5 - Availability */}
-                <div>
-                  <label className="flex items-center gap-3 cursor-pointer group">
-                    <input 
-                      type="checkbox"
-                      checked={draftFilters.availableNow}
-                      onChange={e => setDraftFilters(p => ({ ...p, availableNow: e.target.checked }))}
-                      className="w-4 h-4 rounded-[4px] border-[#E5E7EB] text-[#7C3AED] focus:ring-[#7C3AED] accent-[#7C3AED] cursor-pointer"
-                    />
-                    <span className="text-sm font-semibold text-[#0A0A1A] group-hover:text-[#7C3AED] transition-colors">Available Now only</span>
-                  </label>
-                </div>
-
-                {/* Bottom Actions */}
-                <div className="flex items-center justify-between pt-2">
-                  <button 
-                    onClick={() => {
-                      setDraftFilters(defaultFilters);
-                      setAppliedFilters(defaultFilters);
-                      setIsFilterOpen(false);
-                    }}
-                    className="text-sm font-bold text-[#7C3AED] hover:text-[#0A0A1A] transition-colors bg-transparent border-none outline-none"
-                  >
-                    Clear All
-                  </button>
-                  <button 
-                    onClick={() => {
-                      setAppliedFilters(draftFilters);
-                      setIsFilterOpen(false);
-                    }}
-                    className="px-6 py-2.5 rounded-full bg-gradient-to-r from-[#7C3AED] to-[#06B6D4] text-white text-sm font-bold shadow-md hover:scale-[1.02] transition-transform"
-                  >
-                    Apply Filters
-                  </button>
-                </div>
-
-              </div>
-            )}
-          </div>
         </div>
 
         {loading && <div className="flex justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-[#7C3AED]" /></div>}
@@ -324,17 +434,13 @@ const StudioMarketplace = () => {
         {!loading && filtered.length === 0 && (
           <div className="text-center py-20 bg-white rounded-3xl border border-[rgba(124,58,237,0.10)] shadow-[0_4px_20px_rgba(0,0,0,0.04)]">
             <span className="text-5xl block mb-4">🔍</span>
-            <h3 className="text-xl font-bold text-[#0A0A1A] mb-2">No studios match your filters</h3>
-            <p className="text-[#6B7280] mb-6">Try adjusting your filters</p>
+            <h3 className="text-xl font-bold text-[#0A0A1A] mb-2">No studios match your search</h3>
+            <p className="text-[#6B7280] mb-6">Try a different city or adjust your filters</p>
             <button 
-              onClick={() => {
-                setSearch("");
-                setDraftFilters(defaultFilters);
-                setAppliedFilters(defaultFilters);
-              }}
-              className="px-6 py-3 rounded-full bg-gradient-to-r from-[#7C3AED] to-[#06B6D4] text-white font-bold text-sm"
+              onClick={handleClearAll}
+              className="px-6 py-3 rounded-full bg-gradient-to-r from-[#7C3AED] to-[#06B6D4] text-white font-bold text-sm hover:shadow-[0_4px_15px_rgba(124,58,237,0.3)] transition-all"
             >
-              Clear Filters
+              Clear Search
             </button>
           </div>
         )}

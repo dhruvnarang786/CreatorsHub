@@ -118,25 +118,41 @@ const Index = () => {
                   <p className="text-[11px] font-black uppercase tracking-[2px] text-violet-600 mb-4">I Want to Find</p>
                   <div className="space-y-4">
                     <div className="block group/item cursor-pointer" onClick={() => { setIsDropdownOpen(false); navigateTo('/studios'); }}>
-                      <p className="text-sm font-bold text-gray-900 group-hover/item:text-[#702ae1]">Studio Spaces</p>
+                      <p className="text-sm font-bold text-gray-900 group-hover/item:text-[#702ae1]">Studio Space</p>
                       <p className="text-[11px] text-gray-500 font-medium">Creative havens for rent</p>
                     </div>
-                    <div className="block group/item cursor-pointer" onClick={() => { setIsDropdownOpen(false); navigateTo('/equipment'); }}>
-                      <p className="text-sm font-bold text-gray-900 group-hover/item:text-[#702ae1]">Equipment</p>
-                      <p className="text-[11px] text-gray-500 font-medium">High-end production gear</p>
+                    <div className="block group/item cursor-pointer" onClick={() => { setIsDropdownOpen(false); navigateTo('/professionals?type=videographer'); }}>
+                      <p className="text-sm font-bold text-gray-900 group-hover/item:text-[#702ae1]">Videographer</p>
+                      <p className="text-[11px] text-gray-500 font-medium">Professional video creators</p>
+                    </div>
+                    <div className="block group/item cursor-pointer" onClick={() => { setIsDropdownOpen(false); navigateTo('/professionals?type=photographer'); }}>
+                      <p className="text-sm font-bold text-gray-900 group-hover/item:text-[#702ae1]">Photographer</p>
+                      <p className="text-[11px] text-gray-500 font-medium">Expert lens professionals</p>
+                    </div>
+                    <div className="block group/item cursor-pointer" onClick={() => { setIsDropdownOpen(false); navigateTo('/professionals?type=editor'); }}>
+                      <p className="text-sm font-bold text-gray-900 group-hover/item:text-[#702ae1]">Editor</p>
+                      <p className="text-[11px] text-gray-500 font-medium">Post-production experts</p>
                     </div>
                   </div>
                 </div>
                 <div className="flex-1">
-                  <p className="text-[11px] font-black uppercase tracking-[2px] text-cyan-600 mb-4">I Want to Offer</p>
+                  <p className="text-[11px] font-black uppercase tracking-[2px] text-cyan-600 mb-4">I Want to List</p>
                   <div className="space-y-4">
-                    <div className="block group/item cursor-pointer" onClick={() => { setIsDropdownOpen(false); navigateTo('/register/list-studio'); }}>
-                      <p className="text-sm font-bold text-gray-900 group-hover/item:text-[#006576]">List Space</p>
+                    <div className="block group/item cursor-pointer" onClick={() => { setIsDropdownOpen(false); navigateTo('/studios/list'); }}>
+                      <p className="text-sm font-bold text-gray-900 group-hover/item:text-[#006576]">List Studio Space</p>
                       <p className="text-[11px] text-gray-500 font-medium">Monetize your creative studio</p>
                     </div>
-                    <div className="block group/item cursor-pointer" onClick={() => { setIsDropdownOpen(false); navigateTo('/professionals/register'); }}>
-                      <p className="text-sm font-bold text-gray-900 group-hover/item:text-[#006576]">Production Services</p>
-                      <p className="text-[11px] text-gray-500 font-medium">Editing & Videography</p>
+                    <div className="block group/item cursor-pointer" onClick={() => { setIsDropdownOpen(false); navigateTo('/professionals/register?type=videographer'); }}>
+                      <p className="text-sm font-bold text-gray-900 group-hover/item:text-[#006576]">As a Videographer</p>
+                      <p className="text-[11px] text-gray-500 font-medium">Offer your video services</p>
+                    </div>
+                    <div className="block group/item cursor-pointer" onClick={() => { setIsDropdownOpen(false); navigateTo('/professionals/register?type=photographer'); }}>
+                      <p className="text-sm font-bold text-gray-900 group-hover/item:text-[#006576]">As a Photographer</p>
+                      <p className="text-[11px] text-gray-500 font-medium">Offer your photography</p>
+                    </div>
+                    <div className="block group/item cursor-pointer" onClick={() => { setIsDropdownOpen(false); navigateTo('/equipment/list'); }}>
+                      <p className="text-sm font-bold text-gray-900 group-hover/item:text-[#006576]">List Equipment</p>
+                      <p className="text-[11px] text-gray-500 font-medium">Rent out your gear</p>
                     </div>
                   </div>
                 </div>
