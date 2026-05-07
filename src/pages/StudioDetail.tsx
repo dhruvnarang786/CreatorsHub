@@ -19,7 +19,7 @@ const StudioDetail = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#F8F8FC]" style={{ fontFamily: '"Manrope", sans-serif' }}>
+      <div className="min-h-screen silver-shimmer-bg" style={{ fontFamily: '"Manrope", sans-serif' }}>
         <div className="max-w-5xl mx-auto px-6 py-12">
           <div className="h-6 w-32 rounded bg-[#E5E7EB] animate-pulse mb-8" />
           <div className="h-80 rounded-3xl bg-[#E5E7EB] animate-pulse mb-8" />
@@ -34,7 +34,7 @@ const StudioDetail = () => {
 
   if (!studio) {
     return (
-      <div className="min-h-screen bg-[#F8F8FC] flex items-center justify-center" style={{ fontFamily: '"Manrope", sans-serif' }}>
+      <div className="min-h-screen silver-shimmer-bg flex items-center justify-center" style={{ fontFamily: '"Manrope", sans-serif' }}>
         <div className="text-center space-y-4">
           <span className="text-4xl">🏠</span>
           <h1 className="text-2xl font-bold text-[#0A0A1A]">Studio Not Found</h1>
@@ -50,11 +50,11 @@ const StudioDetail = () => {
   const ownerName = studio.profiles?.full_name || "Studio Owner";
 
   return (
-    <div className="min-h-screen bg-[#F8F8FC] relative overflow-hidden" style={{ fontFamily: '"Manrope", sans-serif' }}>
+    <div className="min-h-screen silver-shimmer-bg relative overflow-hidden" style={{ fontFamily: '"Manrope", sans-serif' }}>
       <div className="absolute -top-32 -right-32 w-[500px] h-[500px] rounded-full bg-[#7C3AED]/10 blur-[120px] pointer-events-none" />
       <div className="absolute -bottom-32 -left-32 w-[400px] h-[400px] rounded-full bg-[#06B6D4]/8 blur-[120px] pointer-events-none" />
 
-      <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur-xl border-b border-[rgba(124,58,237,0.08)] px-6 md:px-12 h-[72px] flex items-center justify-between">
+      <nav className="sticky top-0 z-50 bg-[rgba(226,226,228,0.92)] backdrop-blur-xl border-b border-[rgba(0,0,0,0.06)] px-6 md:px-12 h-[72px] flex items-center justify-between">
         <a href="/" className="font-newsreader italic text-2xl font-bold text-[#0A0A1A]">CreatorsBNB</a>
         <button onClick={() => setBookingOpen(true)} className="px-5 py-2 rounded-full bg-gradient-to-r from-[#7C3AED] to-[#06B6D4] text-white text-sm font-bold hover:shadow-[0_8px_20px_rgba(124,58,237,0.3)] transition-all">Book This Studio</button>
       </nav>

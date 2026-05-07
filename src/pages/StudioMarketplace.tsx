@@ -165,11 +165,11 @@ const StudioMarketplace = () => {
   const activeFilterCount = (appliedPrice[0] > 0 || appliedPrice[1] < 10000 ? 1 : 0) + appliedTypes.length + (appliedAvailable ? 1 : 0) + (appliedSort !== 'relevant' ? 1 : 0);
 
   return (
-    <div className="min-h-screen bg-[#F8F8FC] relative overflow-hidden" style={{ fontFamily: '"Manrope", sans-serif' }}>
+    <div className="min-h-screen silver-shimmer-bg relative overflow-hidden" style={{ fontFamily: '"Manrope", sans-serif' }}>
       <div className="absolute -top-32 -right-32 w-[500px] h-[500px] rounded-full bg-[#7C3AED]/10 blur-[120px] pointer-events-none" />
       <div className="absolute -bottom-32 -left-32 w-[400px] h-[400px] rounded-full bg-[#06B6D4]/8 blur-[120px] pointer-events-none" />
 
-      <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur-xl border-b border-[rgba(124,58,237,0.08)] px-6 md:px-12 h-[72px] flex items-center justify-between">
+      <nav className="sticky top-0 z-50 bg-[rgba(226,226,228,0.92)] backdrop-blur-xl border-b border-[rgba(0,0,0,0.06)] px-6 md:px-12 h-[72px] flex items-center justify-between">
         <a href="/" className="font-newsreader italic text-2xl font-bold text-[#0A0A1A]">CreatorsBNB</a>
         <div className="flex gap-4">
           <button onClick={() => navigate("/signin")} className="text-sm font-bold text-[#0A0A1A] hover:text-[#7C3AED] transition-colors">Sign In</button>
@@ -318,7 +318,7 @@ const StudioMarketplace = () => {
                   {/* Price Range */}
                   <div>
                     <h4 className="text-sm font-bold text-[#0A0A1A]">Price Range</h4>
-                    <p className="text-[#6B7280] text-sm mb-5">₹0 — ₹10,000 per hour</p>
+                    <p className="text-[#6B7280] text-sm mb-5">₹500 — ₹10,000 per hour</p>
                     <SliderPrimitive.Root
                       className="relative flex w-full touch-none select-none items-center"
                       value={draftPrice}
@@ -340,48 +340,35 @@ const StudioMarketplace = () => {
 
                   <div className="h-px bg-[#F3F4F6] w-full" />
 
-                  {/* Studio Type */}
+                  {/* Studio Type — Dropdown */}
                   <div>
                     <h4 className="text-sm font-bold text-[#0A0A1A] mb-4">Studio Type</h4>
-                    <div className="space-y-3">
+                    <select
+                      value={draftTypes[0] || ""}
+                      onChange={(e) => setDraftTypes(e.target.value ? [e.target.value] : [])}
+                      className="w-full px-4 py-3 border border-[#E5E7EB] rounded-[6px] bg-white text-[15px] text-[#0A0A1A] outline-none focus:border-[#7C3AED] transition-colors cursor-pointer"
+                    >
+                      <option value="">All Types</option>
                       {typeOptions.map(type => (
-                        <label key={type} className="flex items-center gap-3 cursor-pointer group">
-                          <input 
-                            type="checkbox"
-                            checked={draftTypes.includes(type)}
-                            onChange={e => {
-                              const types = e.target.checked 
-                                ? [...draftTypes, type] 
-                                : draftTypes.filter(t => t !== type);
-                              setDraftTypes(types);
-                            }}
-                            className="w-5 h-5 rounded-[4px] border-[#E5E7EB] text-[#7C3AED] focus:ring-[#7C3AED] accent-[#7C3AED] cursor-pointer"
-                          />
-                          <span className="text-[15px] text-[#0A0A1A] group-hover:text-[#7C3AED] transition-colors">{type}</span>
-                        </label>
+                        <option key={type} value={type}>{type}</option>
                       ))}
-                    </div>
+                    </select>
                   </div>
 
                   <div className="h-px bg-[#F3F4F6] w-full" />
 
-                  {/* Sort By */}
+                  {/* Sort By — Dropdown */}
                   <div>
                     <h4 className="text-sm font-bold text-[#0A0A1A] mb-4">Sort By</h4>
-                    <div className="space-y-3">
+                    <select
+                      value={draftSort}
+                      onChange={(e) => setDraftSort(e.target.value)}
+                      className="w-full px-4 py-3 border border-[#E5E7EB] rounded-[6px] bg-white text-[15px] text-[#0A0A1A] outline-none focus:border-[#7C3AED] transition-colors cursor-pointer"
+                    >
                       {sortOptions.map(opt => (
-                        <label key={opt.value} className="flex items-center gap-3 cursor-pointer group">
-                          <input 
-                            type="radio" 
-                            name="sortBy" 
-                            checked={draftSort === opt.value}
-                            onChange={() => setDraftSort(opt.value)}
-                            className="w-5 h-5 text-[#7C3AED] border-[#E5E7EB] focus:ring-[#7C3AED] accent-[#7C3AED] cursor-pointer"
-                          />
-                          <span className="text-[15px] text-[#0A0A1A] group-hover:text-[#7C3AED] transition-colors">{opt.label}</span>
-                        </label>
+                        <option key={opt.value} value={opt.value}>{opt.label}</option>
                       ))}
-                    </div>
+                    </select>
                   </div>
 
                   <div className="h-px bg-[#F3F4F6] w-full" />

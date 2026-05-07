@@ -37,11 +37,11 @@ const OwnerDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8F8FC] relative overflow-hidden" style={{ fontFamily: '"Manrope", sans-serif' }}>
+    <div className="min-h-screen silver-shimmer-bg relative overflow-hidden" style={{ fontFamily: '"Manrope", sans-serif' }}>
       <div className="absolute -top-32 -right-32 w-[500px] h-[500px] rounded-full bg-[#7C3AED]/10 blur-[120px] pointer-events-none" />
       <div className="absolute -bottom-32 -left-32 w-[400px] h-[400px] rounded-full bg-[#06B6D4]/8 blur-[120px] pointer-events-none" />
 
-      <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-xl border-b border-[rgba(124,58,237,0.08)] px-8 py-5 flex justify-between items-center">
+      <header className="sticky top-0 z-50 bg-[rgba(226,226,228,0.92)] backdrop-blur-xl border-b border-[rgba(0,0,0,0.06)] px-8 py-5 flex justify-between items-center">
         <a href="/" className="font-newsreader italic text-2xl font-bold text-[#0A0A1A]">CreatorsBNB</a>
         <div className="flex items-center gap-6">
           <div className="text-right"><p className="text-sm font-bold text-[#0A0A1A]">{profile?.full_name}</p><p className="text-xs text-[#9CA3AF]">Studio Owner</p></div>

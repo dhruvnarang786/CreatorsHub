@@ -1,11 +1,21 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getTrendingStudios, getTrendingProfessionals } from "@/services/supabase-service";
 
-const CAROUSEL_VIDEOS = [
+const SHOWCASE_VIDEOS = [
   "https://res.cloudinary.com/drulic8e0/video/upload/v1776249407/14478811_1080_1920_30fps_e1w0ct.mp4",
   "https://res.cloudinary.com/drulic8e0/video/upload/v1776798751/15628135_1080_1920_30fps_fhqzwv.mp4",
   "https://res.cloudinary.com/drulic8e0/video/upload/v1776798733/15422875_1080_1920_30fps_dnzlsc.mp4",
+  "https://res.cloudinary.com/drulic8e0/video/upload/v1778009814/3917780-uhd_2160_4096_25fps_a2r4y9.mp4",
+  "https://res.cloudinary.com/drulic8e0/video/upload/v1778009855/14961399_2160_3840_50fps_xxfkws.mp4",
+];
+
+const SHAPE_GRADIENTS = [
+  "shape-gradient-1",
+  "shape-gradient-2",
+  "shape-gradient-3",
+  "shape-gradient-4",
+  "shape-gradient-5",
 ];
 
 const COLORS = ["primary", "secondary", "tertiary", "primary"];
@@ -46,7 +56,6 @@ function ProfileCard({ name, location, price, rating, img, accentClass = "text-[
 
 /* ─── Main Index Page ─── */
 const Index = () => {
-  const [carouselIdx, setCarouselIdx] = useState(1);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const navigateTo = useNavigate();
 
@@ -71,39 +80,19 @@ const Index = () => {
     fetchTrending();
   }, []);
 
-
-  // Carousel auto-rotation
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCarouselIdx((prev) => (prev + 1) % 3);
-    }, 3500);
-    return () => clearInterval(interval);
-  }, []);
-
-  const getCardClass = useCallback(
-    (idx: number) => {
-      const centerIdx = carouselIdx;
-      const leftIdx = (carouselIdx + 2) % 3;
-      const rightIdx = (carouselIdx + 1) % 3;
-      if (idx === centerIdx) return "carousel-card card-center pulsing-glow";
-      if (idx === leftIdx) return "carousel-card card-side card-left";
-      if (idx === rightIdx) return "carousel-card card-side card-right";
-      return "carousel-card card-side";
-    },
-    [carouselIdx]
-  );
-
   return (
-    <div className="bg-[#f6f6f6] text-[#2d2f2f] overflow-x-hidden" style={{ fontFamily: '"Manrope", sans-serif' }}>
+    <div className="silver-shimmer-bg text-[#2d2f2f] overflow-x-hidden" style={{ fontFamily: '"Manrope", sans-serif' }}>
+      {/* Silver Sparkle Noise Layer */}
+      <div className="silver-sparkle-noise" />
       {/* Grain Overlay */}
       <div className="fixed inset-0 grain-overlay z-[60] pointer-events-none" />
 
       {/* ═══ NAVIGATION ═══ */}
-      <nav className="fixed top-0 w-full z-50 bg-[rgba(255,255,255,0.88)] backdrop-blur-2xl flex justify-between items-center px-6 md:px-12 h-[72px] max-w-full border-b border-gray-100">
+      <nav className="fixed top-0 w-full z-50 bg-[rgba(226,226,228,0.92)] backdrop-blur-2xl flex justify-between items-center px-6 md:px-12 h-[72px] max-w-full border-b border-[rgba(0,0,0,0.06)]">
         <a className="font-newsreader italic text-2xl font-bold text-[#0A0A1A] logo-shimmer transition-all" href="#hero">CreatorsBNB</a>
         <div className="hidden md:flex gap-10 text-[15px] font-bold tracking-tight h-full items-center">
           <a className="text-[#0A0A1A] hover:text-[#702ae1] transition-colors" href="#hero">Home</a>
-          <a className="text-[#0A0A1A] hover:text-[#702ae1] transition-colors" href="#about">About Us</a>
+          <a className="text-[#0A0A1A] hover:text-[#702ae1] transition-colors" href="#about-us">About Us</a>
           <div
             className="relative h-full flex items-center group"
             onMouseEnter={() => setIsDropdownOpen(true)}
@@ -159,7 +148,8 @@ const Index = () => {
               </div>
             )}
           </div>
-          <a className="text-[#0A0A1A] hover:text-[#702ae1] transition-colors" href="#contact">Contact Us</a>
+          <a className="text-[#0A0A1A] hover:text-[#702ae1] transition-colors cursor-pointer" onClick={() => navigateTo('/influencer-discovery')}>Influencer Discovery</a>
+          <a className="text-[#0A0A1A] hover:text-[#702ae1] transition-colors" href="#footer">Contact Us</a>
         </div>
         <div className="flex items-center gap-4">
           <button onClick={() => navigateTo('/signin')} className="text-[#0A0A1A] font-bold text-[14px] px-5 py-2 hover:opacity-70 transition-opacity">Sign In</button>
@@ -170,97 +160,117 @@ const Index = () => {
       </nav>
 
       {/* ═══ HERO SECTION ═══ */}
-      <section className="relative min-h-screen pt-32 pb-20 px-6 md:px-8 bg-white flex flex-col md:flex-row items-center overflow-hidden" id="hero">
-        {/* Neon Blobs */}
-        <div className="absolute -top-24 -right-24 w-96 h-96 bg-[#702ae1] opacity-20 blur-[120px] rounded-full pointer-events-none" />
-        <div className="absolute top-10 -left-24 w-96 h-96 bg-[#006576] opacity-20 blur-[120px] rounded-full pointer-events-none" />
-        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 w-96 h-96 bg-[#b00d6a] opacity-10 blur-[120px] rounded-full pointer-events-none" />
+      <section className="relative min-h-screen pt-28 pb-20 px-6 md:px-8 flex flex-col items-center overflow-hidden" id="hero">
+        {/* 5-Shape Showcase Gallery */}
+        <div className="showcase-gallery z-10 mt-8">
+          {SHOWCASE_VIDEOS.map((src, idx) => {
+            const shapeClass = idx === 2 ? 'center-shape' : (idx === 1 || idx === 3) ? 'shape-type-b' : '';
+            return (
+              <div key={idx} className={`showcase-shape ${shapeClass}`}>
+                <div className={`gradient-fill ${SHAPE_GRADIENTS[idx]}`} />
+                <video autoPlay className="w-full h-full object-cover" loop muted playsInline>
+                  <source src={src} type="video/mp4" />
+                </video>
+              </div>
+            );
+          })}
+        </div>
 
-        <div className="w-full md:w-1/2 z-10 space-y-10">
-          <span className="inline-flex items-center px-4 py-1.5 rounded-full bg-white border border-[#702ae1]/20 text-xs font-bold tracking-widest uppercase">
-            <span className="mr-2">✦</span>
-            <span className="bg-gradient-to-r from-[#702ae1] to-[#b00d6a] bg-clip-text text-transparent">For Creators. Built Different.</span>
-          </span>
-          <h1 className="font-headline text-6xl md:text-8xl font-extrabold leading-[1.1] tracking-tight" style={{ fontFamily: '"Newsreader", serif' }}>
-            Your Creative <br />
-            <span className="italic neon-gradient-text">Space,</span> <br />
-            On Demand.
+        {/* Text Section Below Shapes */}
+        <div className="z-10 text-center mt-12 max-w-2xl mx-auto space-y-6">
+          <h1 className="text-4xl md:text-[48px] font-extrabold leading-[1.15] tracking-tight text-[#000000]" style={{ fontFamily: '"Newsreader", serif' }}>
+            Your Creative Space, On Demand.
           </h1>
-          <p className="text-[#5a5c5c] max-w-[460px] text-lg leading-relaxed" style={{ fontFamily: '"Manrope", sans-serif' }}>
+          <p className="text-[#6b6b6b] text-base md:text-[16px] leading-relaxed max-w-xl mx-auto" style={{ fontFamily: '"Manrope", sans-serif' }}>
             Unlock high-end production environments. From minimalist editorial lofts to neon-drenched sound stages, find your next masterpiece's birthplace.
           </p>
-          <div className="flex flex-wrap gap-4 pt-4">
+          <div className="flex flex-wrap gap-4 pt-2 justify-center">
             <button onClick={() => navigateTo('/studios')} className="px-8 py-4 rounded-full bg-gradient-to-r from-[#702ae1] to-[#006576] text-white font-bold text-lg hover:scale-105 transition-all duration-300 neon-pulse-shadow group flex items-center">
               Find a Studio <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
             </button>
-            <button onClick={() => navigateTo('/register/list-studio')} className="px-8 py-4 rounded-full border-2 border-[#acadad]/30 font-bold text-lg hover:bg-[#f0f1f1] transition-colors">
+            <button onClick={() => navigateTo('/register/list-studio')} className="px-8 py-4 rounded-full border-2 border-[#000000] font-bold text-lg hover:bg-[#f0f1f1] transition-colors text-[#000000]">
               List Your Space
             </button>
           </div>
-          <div className="flex gap-12 pt-8" id="about">
-            <div className="space-y-1">
+          <div className="flex gap-12 pt-6 justify-center">
+            <div className="space-y-1 text-center">
               <p className="font-headline italic text-3xl font-bold bg-gradient-to-br from-[#702ae1] to-[#006576] bg-clip-text text-transparent" style={{ fontFamily: '"Newsreader", serif' }}>12K+</p>
               <p className="text-xs font-bold uppercase tracking-widest text-[#5a5c5c] opacity-60">Studios</p>
             </div>
-            <div className="space-y-1">
+            <div className="space-y-1 text-center">
               <p className="font-headline italic text-3xl font-bold bg-gradient-to-br from-[#702ae1] to-[#b00d6a] bg-clip-text text-transparent" style={{ fontFamily: '"Newsreader", serif' }}>50K+</p>
               <p className="text-xs font-bold uppercase tracking-widest text-[#5a5c5c] opacity-60">Creators</p>
             </div>
-            <div className="space-y-1">
+            <div className="space-y-1 text-center">
               <p className="font-headline italic text-3xl font-bold bg-gradient-to-br from-[#006576] to-[#b00d6a] bg-clip-text text-transparent" style={{ fontFamily: '"Newsreader", serif' }}>98%</p>
               <p className="text-xs font-bold uppercase tracking-widest text-[#5a5c5c] opacity-60">Satisfaction</p>
             </div>
           </div>
         </div>
+      </section>
 
-        {/* Hero Right: Asymmetric Video Carousel */}
-        <div className="w-full md:w-1/2 relative mt-20 md:mt-0 flex flex-col justify-center items-center overflow-visible min-h-[550px]">
-          <div className="absolute inset-0 dot-grid opacity-30 z-0 pointer-events-none" />
-          <div className="carousel-container z-10">
-            {CAROUSEL_VIDEOS.map((src, idx) => (
-              <div key={idx} className={getCardClass(idx)}>
-                <video autoPlay className="w-full h-full object-cover" loop muted playsInline>
-                  <source src={src} type="video/mp4" />
-                </video>
-              </div>
-            ))}
+      {/* ═══ ABOUT US ═══ */}
+      <section className="relative py-20 md:py-24 px-6 md:px-10 overflow-hidden" id="about-us">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-10 md:gap-16">
+          {/* Left Column — Image */}
+          <div className="w-full md:w-[45%] flex-shrink-0">
+            <img
+              src="/creators-collab.png"
+              alt="Diverse group of content creators collaborating on a production shoot in a professional studio space"
+              className="w-full h-auto rounded-[28px] shadow-[0_10px_30px_rgba(0,0,0,0.1)] border border-[#E0E0E0]"
+              style={{ maxHeight: 550 }}
+            />
           </div>
-          {/* Progress Dots */}
-          <div className="flex gap-3 mt-12">
-            {[0, 1, 2].map((i) => (
-              <div
-                key={i}
-                className={`rounded-full transition-all duration-300 ${
-                  i === carouselIdx
-                    ? "w-8 h-2 bg-[#702ae1]"
-                    : "w-2 h-2 bg-white border border-gray-200"
-                }`}
-              />
-            ))}
+          {/* Right Column — Text */}
+          <div className="w-full md:w-[55%]">
+            <p className="text-xs md:text-sm font-bold uppercase tracking-[1px] text-[#000000] mb-4" style={{ fontFamily: '"Manrope", sans-serif' }}>#ABOUT US</p>
+            <h2 className="text-3xl md:text-[48px] font-bold leading-[1.2] text-[#000000] mb-8" style={{ fontFamily: '"Newsreader", serif' }}>Get To Know Us</h2>
+            <div className="space-y-4 max-w-[550px]" style={{ fontFamily: '"Manrope", sans-serif' }}>
+              <p className="text-[15px] md:text-[16px] font-bold text-[#000000] leading-[1.7]">
+                CreatorsBNB — where Creators find the best ecosystem for their shoots! Built for the next generation of creators, CreatorsBNB connects content creators with inspiring studios, production spaces, and unique shoot locations — making it effortless to find, book, and create.
+              </p>
+              <p className="text-[15px] md:text-[16px] font-bold text-[#000000] leading-[1.7]">
+                Whether it's an instagram reel shoot, fashion campaign, YouTube production, or brand shoot, we help creators unlock the perfect environment to bring ideas to life.
+              </p>
+              <p className="text-[15px] md:text-[16px] font-bold text-[#000000] leading-[1.7]">
+                At the same time, we empower studio owners to transform their spaces into thriving creative destinations.
+              </p>
+              <p className="text-[15px] md:text-[16px] font-bold text-[#000000] leading-[1.7]">
+                CreatorsBNB isn't just a booking platform — it's the ecosystem powering the future of content creation.
+              </p>
+              <p className="text-[15px] md:text-[16px] font-extrabold text-[#000000] leading-[1.7]">
+                Create bigger. Shoot smarter. Book better.
+              </p>
+            </div>
+            <button
+              onClick={() => navigateTo('/studios')}
+              className="mt-8 px-8 py-3 rounded-full bg-[#000000] text-white font-bold text-[15px] hover:opacity-80 hover:scale-[1.02] transition-all duration-300 flex items-center group"
+            >
+              Connect Now <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
+            </button>
           </div>
         </div>
       </section>
 
       {/* ═══ FIND YOUR VIBE ═══ */}
-      <section className="relative py-32 px-6 md:px-8 bg-[#f6f6f6] overflow-hidden" id="services">
+      <section className="relative py-32 px-6 md:px-8 overflow-hidden" id="find-your-vibe">
         <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-[#702ae1] to-transparent opacity-50 pointer-events-none" />
         <div className="absolute -bottom-24 -right-24 w-[500px] h-[500px] bg-[#702ae1]/5 blur-[150px] rounded-full pointer-events-none" />
         <div className="max-w-7xl mx-auto">
           <h2 className="font-headline text-5xl font-bold mb-16 text-center" style={{ fontFamily: '"Newsreader", serif' }}>
-            <span className="font-black text-6xl text-[#0A0A1A]">Find your</span>{" "}
-            <span className="italic neon-gradient-text text-6xl">vibe.</span>
+            <span className="font-black text-6xl text-[#000000]">Find your vibe.</span>
           </h2>
           <div className="grid md:grid-cols-2 gap-8">
             {/* Card 1: I Want to Find */}
             <div className="group relative bg-[#F8F8FC] p-12 rounded-[2.5rem] overflow-hidden border border-[#702ae1]/5 hover:scale-[1.02] transition-all duration-500 hover:shadow-2xl hover:shadow-[#702ae1]/10">
               <div className="relative z-10">
-                <h3 className="font-newsreader italic text-5xl font-bold text-[#7C3AED] mb-8">I Want to Find</h3>
+                <h3 className="font-newsreader text-5xl font-bold text-[#000000] mb-8">I Want to Find</h3>
                 <div className="space-y-6">
                   {[
                     { icon: "camera_indoor", label: "Studio Space", path: "/studios" },
                     { icon: "videocam", label: "Videographer", path: "/professionals?type=videographer" },
-                    { icon: "movie_edit", label: "Editor", path: "/professionals?type=editor" },
-                    { icon: "home_repair_service", label: "Equipment", path: "/equipment" },
+                    { icon: "movie_edit", label: "Video Editor", path: "/professionals?type=editor" },
+                    { icon: "home_repair_service", label: "Casting Equipment", path: "/equipment" },
                   ].map((item) => (
                     <div key={item.label} onClick={() => navigateTo(item.path)} className="flex items-center gap-6 p-4 rounded-2xl hover:bg-white transition-colors cursor-pointer">
                       <div className="w-14 h-14 rounded-2xl bg-[#b28cff] flex items-center justify-center text-[#702ae1]">
@@ -275,13 +285,13 @@ const Index = () => {
             {/* Card 2: I Want to List */}
             <div className="group relative bg-[#F8F8FC] p-12 rounded-[2.5rem] overflow-hidden border border-[#006576]/5 hover:scale-[1.02] transition-all duration-500 hover:shadow-2xl hover:shadow-[#006576]/10">
               <div className="relative z-10">
-                <h3 className="font-newsreader italic text-5xl font-bold text-[#06B6D4] mb-8">I Want to List</h3>
+                <h3 className="font-newsreader text-5xl font-bold text-[#000000] mb-8">I Want to List</h3>
                 <div className="space-y-6">
                   {[
-                    { icon: "add_business", label: "List My Studio", path: "/register/list-studio" },
-                    { icon: "person_add", label: "Offer Videography", path: "/professionals/register?type=videographer" },
-                    { icon: "edit_square", label: "Offer Editing", path: "/professionals/register?type=editor" },
-                    { icon: "inventory_2", label: "Rent Out Equipment", path: "/register/list-equipment" },
+                    { icon: "add_business", label: "Studio", path: "/register/list-studio" },
+                    { icon: "person_add", label: "List as Videographer", path: "/professionals/register?type=videographer" },
+                    { icon: "edit_square", label: "List as Video Editor", path: "/professionals/register?type=editor" },
+                    { icon: "inventory_2", label: "Rent my Equipment", path: "/register/list-equipment" },
                   ].map((item) => (
                     <div key={item.label} onClick={() => navigateTo(item.path)} className="flex items-center gap-6 p-4 rounded-2xl hover:bg-white transition-colors cursor-pointer">
                       <div className="w-14 h-14 rounded-2xl bg-[#65e1ff] flex items-center justify-center text-[#006576]">
@@ -298,10 +308,10 @@ const Index = () => {
       </section>
 
       {/* ═══ TRENDING STUDIOS ═══ */}
-      <section className="py-32 px-6 md:px-8 bg-[#F8F8FC]" id="studios">
+      <section className="py-32 px-6 md:px-8" id="studios">
         <div className="max-w-7xl mx-auto">
-          <h2 className="font-headline text-6xl font-bold mb-16" style={{ fontFamily: '"Newsreader", serif' }}>
-            Trending <span className="italic text-[#702ae1]">Studios</span>
+          <h2 className="font-headline text-6xl font-bold mb-16 text-[#000000]" style={{ fontFamily: '"Newsreader", serif' }}>
+            Trending <span className="italic">Studios</span>
           </h2>
           {loadingTrending ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -334,10 +344,10 @@ const Index = () => {
       </section>
 
       {/* ═══ TRENDING EDITORS ═══ */}
-      <section className="py-32 px-6 md:px-8 bg-white" id="editors">
+      <section className="py-32 px-6 md:px-8" id="editors">
         <div className="max-w-7xl mx-auto">
-          <h2 className="font-headline text-6xl font-bold mb-16" style={{ fontFamily: '"Newsreader", serif' }}>
-            <span className="font-black">Trending</span> <span className="italic text-[#7C3AED]">Editors</span>
+          <h2 className="font-headline text-6xl font-bold mb-16 text-[#000000]" style={{ fontFamily: '"Newsreader", serif' }}>
+            <span className="font-black">Trending</span> <span className="italic">Editors</span>
           </h2>
           {loadingTrending ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -356,10 +366,10 @@ const Index = () => {
       </section>
 
       {/* ═══ TRENDING VIDEOGRAPHERS ═══ */}
-      <section className="py-32 px-6 md:px-8 bg-[#F8F8FC]" id="videographers">
+      <section className="py-32 px-6 md:px-8" id="videographers">
         <div className="max-w-7xl mx-auto">
-          <h2 className="font-headline text-6xl font-bold mb-16" style={{ fontFamily: '"Newsreader", serif' }}>
-            <span className="font-black">Trending</span> <span className="italic text-[#06B6D4]">Videographers</span>
+          <h2 className="font-headline text-6xl font-bold mb-16 text-[#000000]" style={{ fontFamily: '"Newsreader", serif' }}>
+            <span className="font-black">Trending</span> <span className="italic">Videographers</span>
           </h2>
           {loadingTrending ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -377,28 +387,8 @@ const Index = () => {
         </div>
       </section>
 
-      {/* ═══ CTA BANNER ═══ */}
-      <section className="relative px-6 md:px-8 pb-32" id="contact">
-        <div className="max-w-7xl mx-auto rounded-[3rem] p-12 md:p-24 relative overflow-hidden bg-gradient-to-br from-[#702ae1] via-[#006576] to-[#b00d6a]">
-          <div className="relative z-10 text-center space-y-10">
-            <h2 className="font-headline italic text-5xl md:text-8xl font-bold text-white tracking-tight" style={{ fontFamily: '"Newsreader", serif' }}>
-              Ready to take the stage?
-            </h2>
-            <div className="flex justify-center">
-              <button className="px-10 py-5 rounded-full bg-white text-lg font-bold hover:scale-110 transition-transform shadow-2xl flex items-center group">
-                <span className="bg-gradient-to-r from-[#702ae1] to-[#006576] bg-clip-text text-transparent">Get Started Free</span>
-                <span className="ml-2 text-[#702ae1] group-hover:translate-x-1 transition-transform">→</span>
-              </button>
-            </div>
-          </div>
-          {/* Decorative pulses */}
-          <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
-          <div className="absolute bottom-0 left-0 w-64 h-64 bg-black/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 pointer-events-none" />
-        </div>
-      </section>
-
       {/* ═══ FOOTER ═══ */}
-      <footer className="w-full py-20 px-6 md:px-12 mt-20 bg-[#07070E] text-white" style={{ borderTop: '2px solid transparent', borderImage: 'linear-gradient(to right, #702ae1, #06B6D4, #b00d6a) 1' }}>
+      <footer id="footer" className="w-full py-20 px-6 md:px-12 mt-20 bg-[#07070E] text-white" style={{ borderTop: '2px solid transparent', borderImage: 'linear-gradient(to right, #702ae1, #06B6D4, #b00d6a) 1' }}>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 max-w-7xl mx-auto">
           <div className="space-y-6">
             <div className="font-newsreader text-2xl font-black text-white">CreatorsBNB</div>

@@ -15,6 +15,7 @@ import StudioMarketplace from "./pages/StudioMarketplace";
 import StudioDetail from "./pages/StudioDetail";
 import Professionals from "./pages/Professionals";
 import Equipment from "./pages/Equipment";
+import InfluencerDiscovery from "./pages/InfluencerDiscovery";
 
 // Registration Pages (existing)
 import ExplorePage from "./pages/ExplorePage";
@@ -57,6 +58,7 @@ const App = () => (
             <Route path="/studio/:id" element={<StudioDetail />} />
             <Route path="/professionals" element={<Professionals />} />
             <Route path="/equipment" element={<Equipment />} />
+            <Route path="/influencer-discovery" element={<InfluencerDiscovery />} />
             <Route path="/explore" element={<ExplorePage />} />
             <Route path="/category/:categoryId" element={<CategoryPage />} />
 

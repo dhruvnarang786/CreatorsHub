@@ -41,7 +41,7 @@ const SignUp = () => {
 
   if (success) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white px-6 relative overflow-hidden" style={{ fontFamily: '"Manrope", sans-serif' }}>
+      <div className="min-h-screen flex items-center justify-center silver-shimmer-bg px-6 relative overflow-hidden" style={{ fontFamily: '"Manrope", sans-serif' }}>
         <div className="absolute -top-32 -right-32 w-[500px] h-[500px] rounded-full bg-[#7C3AED]/10 blur-[120px] pointer-events-none" />
         <div className="absolute -bottom-32 -left-32 w-[400px] h-[400px] rounded-full bg-[#06B6D4]/8 blur-[120px] pointer-events-none" />
         <div className="relative z-10 max-w-md w-full text-center space-y-8">
@@ -68,7 +68,7 @@ const SignUp = () => {
   const inputClass = "w-full px-5 py-4 rounded-[10px] bg-white border-[1.5px] border-[#E5E7EB] text-[#0A0A1A] placeholder:text-[#9CA3AF] focus:outline-none focus:border-[#7C3AED] focus:shadow-[0_0_0_3px_rgba(124,58,237,0.10)] transition-all"
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-white px-6 py-16 relative overflow-hidden" style={{ fontFamily: '"Manrope", sans-serif' }}>
+    <div className="min-h-screen flex items-center justify-center silver-shimmer-bg px-6 py-16 relative overflow-hidden" style={{ fontFamily: '"Manrope", sans-serif' }}>
       {/* Background blobs */}
       <div className="absolute -top-32 -right-32 w-[500px] h-[500px] rounded-full bg-[#7C3AED]/10 blur-[120px] pointer-events-none" />
       <div className="absolute -bottom-32 -left-32 w-[400px] h-[400px] rounded-full bg-[#06B6D4]/8 blur-[120px] pointer-events-none" />

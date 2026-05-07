@@ -35,6 +35,64 @@ input[type="search"], input[type="url"], input[type="tel"],
 input[type="number"], input[type="date"], input[type="time"],
 textarea { cursor: text; }
 
+/* ═══ GLOBAL Silver Background — Applied to ALL pages ═══ */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: #E2E2E4 !important;
+  position: relative;
+}
+
+/* Global sparkle texture (always present — matches homepage) */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: url('/silver-sparkle-bg.png') center center / cover no-repeat fixed;
+  opacity: 0.6;
+}
+
+/* Global bokeh glow blobs */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse 400px 400px at 20% 25%, rgba(255,255,255,0.5) 0%, transparent 65%),
+    radial-gradient(ellipse 350px 300px at 75% 20%, rgba(255,255,255,0.4) 0%, transparent 60%),
+    radial-gradient(ellipse 500px 400px at 50% 55%, rgba(255,255,255,0.35) 0%, transparent 55%),
+    radial-gradient(ellipse 300px 300px at 85% 80%, rgba(255,255,255,0.4) 0%, transparent 60%),
+    radial-gradient(ellipse 350px 300px at 10% 75%, rgba(255,255,255,0.35) 0%, transparent 60%);
+  animation: bokehPulse 8s ease-in-out infinite alternate;
+}
+
+/* Global diagonal sweep shine (same as homepage) */
+#root::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(
+    115deg,
+    transparent 0%,
+    transparent 30%,
+    rgba(255,255,255,0.12) 42%,
+    rgba(255,255,255,0.25) 50%,
+    rgba(255,255,255,0.12) 58%,
+    transparent 70%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  pointer-events: none;
+  z-index: 0;
+  animation: shimmerSweep 5s ease-in-out infinite;
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -86,7 +144,8 @@ textarea { cursor: text; }
   }
 
   body {
-    @apply bg-background text-foreground antialiased;
+    @apply text-foreground antialiased;
+    background-color: #E2E2E4 !important;
     font-family: 'Manrope', ui-sans-serif, system-ui, -apple-system, sans-serif;
     scroll-behavior: smooth;
   }
@@ -144,48 +203,243 @@ textarea { cursor: text; }
   animation: shimmer 1.5s linear infinite;
 }
 
-/* Carousel Styles */
-.carousel-container {
+/* ═══ Silver Shimmer Background — Real Sparkle Texture ═══ */
+.silver-shimmer-bg {
+  background-color: #E2E2E4;
   position: relative;
-  width: 600px;
-  height: 450px;
+}
+
+/* Layer 1: Actual silver sparkle texture image */
+.silver-sparkle-noise {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: url('/silver-sparkle-bg.png') center center / cover no-repeat fixed;
+  opacity: 0.45;
+}
+
+/* Layer 2: Soft bokeh glow blobs for depth */
+.silver-shimmer-bg::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 400px 400px at 20% 25%, rgba(255,255,255,0.5) 0%, transparent 65%),
+    radial-gradient(ellipse 350px 300px at 75% 20%, rgba(255,255,255,0.4) 0%, transparent 60%),
+    radial-gradient(ellipse 500px 400px at 50% 55%, rgba(255,255,255,0.35) 0%, transparent 55%),
+    radial-gradient(ellipse 300px 300px at 85% 80%, rgba(255,255,255,0.4) 0%, transparent 60%),
+    radial-gradient(ellipse 350px 300px at 10% 75%, rgba(255,255,255,0.35) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+  animation: bokehPulse 8s ease-in-out infinite alternate;
+}
+
+/* Layer 3: Sweeping diagonal shine animation */
+.silver-shimmer-bg::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(
+    115deg,
+    transparent 0%,
+    transparent 30%,
+    rgba(255,255,255,0.12) 42%,
+    rgba(255,255,255,0.25) 50%,
+    rgba(255,255,255,0.12) 58%,
+    transparent 70%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  pointer-events: none;
+  z-index: 0;
+  animation: shimmerSweep 5s ease-in-out infinite;
+}
+
+@keyframes bokehPulse {
+  0% { opacity: 0.7; }
+  50% { opacity: 1; }
+  100% { opacity: 0.75; }
+}
+
+@keyframes shimmerSweep {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ═══ Showcase Gallery (5-Shape A-B-A-B-A Layout) ═══ */
+.showcase-gallery {
   display: flex;
   align-items: center;
   justify-content: center;
-  transform-style: preserve-3d;
+  gap: 28px;
+  padding: 20px 0;
 }
 
-.carousel-card {
-  position: absolute;
-  border-radius: 8px 48px 8px 48px;
-  transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+/* Type A shapes (1, 3, 5) — wider */
+.showcase-shape {
+  width: 185px;
+  height: 320px;
+  border-radius: 24px;
+  border: 4px solid #000000;
   overflow: hidden;
+  position: relative;
+  flex-shrink: 0;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.10);
+  transition: transform 0.4s cubic-bezier(0.4,0,0.2,1), box-shadow 0.4s ease;
 }
 
-.card-center {
-  width: 280px;
-  height: 420px;
-  z-index: 30;
-  opacity: 1;
-  transform: translateX(0) scale(1);
-  border: 2px solid #702ae1;
-  box-shadow: 0 0 30px rgba(112, 42, 225, 0.4);
+.showcase-shape:hover {
+  transform: translateY(-8px) scale(1.04);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.25), 0 4px 12px rgba(0,0,0,0.15);
 }
 
-.card-side {
-  width: 220px;
-  height: 330px;
-  z-index: 20;
-  opacity: 0.5;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+/* Type B shapes (2, 4) — narrower, same height */
+.showcase-shape.shape-type-b {
+  width: 160px;
+  height: 320px;
 }
 
-.card-left {
-  transform: translateX(-180px) scale(0.85);
+/* Center shape (3) — largest, hero focal point */
+.showcase-shape.center-shape {
+  width: 210px;
+  height: 370px;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.22), 0 4px 12px rgba(0,0,0,0.12);
 }
 
-.card-right {
-  transform: translateX(180px) scale(0.85);
+.showcase-shape.center-shape:hover {
+  box-shadow: 0 20px 48px rgba(0,0,0,0.30), 0 6px 16px rgba(0,0,0,0.18);
+}
+
+/* ─── Unique asymmetric border-radius per shape ─── */
+/* Shape 1: Rounded top-left + bottom-right (pill-ish diagonal) */
+.showcase-shape:nth-child(1) {
+  border-radius: 48px 12px 48px 12px;
+}
+
+/* Shape 2: Rounded top-right + bottom-left */
+.showcase-shape:nth-child(2) {
+  border-radius: 12px 48px 12px 48px;
+}
+
+/* Shape 3 (center): Full rounded top, straight bottom */
+.showcase-shape:nth-child(3) {
+  border-radius: 60px 60px 16px 16px;
+}
+
+/* Shape 4: Rounded bottom-right + top-left (mirror of shape 2) */
+.showcase-shape:nth-child(4) {
+  border-radius: 48px 12px 48px 12px;
+}
+
+/* Shape 5: Full rounded bottom, straight top */
+.showcase-shape:nth-child(5) {
+  border-radius: 16px 16px 60px 60px;
+}
+
+.showcase-shape video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Gradient fills for shapes (fallback behind video) */
+.showcase-shape .gradient-fill {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.showcase-shape video {
+  position: relative;
+  z-index: 1;
+}
+
+.shape-gradient-1 { background: linear-gradient(180deg, #5A2D82 0%, #8B5FA8 100%); }
+.shape-gradient-2 { background: linear-gradient(180deg, #185FA5 0%, #4D90D4 100%); }
+.shape-gradient-3 { background: linear-gradient(180deg, #B85B35 0%, #E8845C 100%); }
+.shape-gradient-4 { background: linear-gradient(180deg, #8D3D60 0%, #C9658E 100%); }
+.shape-gradient-5 { background: linear-gradient(180deg, #4D7A1A 0%, #7BA940 100%); }
+
+/* Floating/Breathing Animations — staggered per shape */
+.showcase-shape:nth-child(1) { animation: floatBreath 4.5s ease-in-out infinite; }
+.showcase-shape:nth-child(2) { animation: floatBreath 5.0s ease-in-out 0.4s infinite; }
+.showcase-shape:nth-child(3) { animation: floatBreath 4.0s ease-in-out 0.8s infinite; }
+.showcase-shape:nth-child(4) { animation: floatBreath 5.5s ease-in-out 0.2s infinite; }
+.showcase-shape:nth-child(5) { animation: floatBreath 4.8s ease-in-out 0.6s infinite; }
+
+@keyframes floatBreath {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.showcase-shape:hover {
+  animation-play-state: paused;
+}
+
+/* ═══ Responsive ═══ */
+@media (max-width: 1024px) {
+  .showcase-gallery {
+    gap: 18px;
+  }
+  .showcase-shape {
+    width: 150px;
+    height: 265px;
+  }
+  .showcase-shape.shape-type-b {
+    width: 130px;
+    height: 265px;
+  }
+  .showcase-shape.center-shape {
+    width: 170px;
+    height: 310px;
+  }
+}
+
+@media (max-width: 768px) {
+  .showcase-gallery {
+    flex-wrap: wrap;
+    gap: 14px;
+    justify-content: center;
+  }
+  .showcase-shape {
+    width: 120px;
+    height: 210px;
+  }
+  .showcase-shape.shape-type-b {
+    width: 105px;
+    height: 210px;
+  }
+  .showcase-shape.center-shape {
+    width: 140px;
+    height: 245px;
+  }
+}
+
+@media (max-width: 480px) {
+  .showcase-gallery {
+    gap: 8px;
+  }
+  .showcase-shape {
+    width: 95px;
+    height: 165px;
+    border-width: 3px;
+  }
+  .showcase-shape.shape-type-b {
+    width: 80px;
+    height: 165px;
+  }
+  .showcase-shape.center-shape {
+    width: 110px;
+    height: 195px;
+  }
+  /* Simplify radii on small screens */
+  .showcase-shape:nth-child(1) { border-radius: 32px 8px 32px 8px; }
+  .showcase-shape:nth-child(2) { border-radius: 8px 32px 8px 32px; }
+  .showcase-shape:nth-child(3) { border-radius: 40px 40px 12px 12px; }
+  .showcase-shape:nth-child(4) { border-radius: 32px 8px 32px 8px; }
+  .showcase-shape:nth-child(5) { border-radius: 12px 12px 40px 40px; }
 }
 
 /* Dropdown */
