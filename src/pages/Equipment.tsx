@@ -2,15 +2,23 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { getEquipment } from "@/services/supabase-service";
+import { useAuth } from '@/context/AuthContext';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const Equipment = () => {
   const navigate = useNavigate();
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const { user, profile, signOut } = useAuth();
+  const handleSignOut = async () => { await signOut(); navigate('/'); };
 
   useEffect(() => {
-    getEquipment().then(({ data }) => { setItems(data || []); setLoading(false); });
+    const timeout = setTimeout(() => { setItems([]); setLoading(false); }, 5000);
+    getEquipment().then(({ data }) => {
+      clearTimeout(timeout);
+      setItems(data || []);
+      setLoading(false);
+    }).catch(() => { clearTimeout(timeout); setItems([]); setLoading(false); });
   }, []);
 
   return (
@@ -21,8 +29,17 @@ const Equipment = () => {
       <nav className="sticky top-0 z-50 bg-[rgba(226,226,228,0.92)] backdrop-blur-xl border-b border-[rgba(0,0,0,0.06)] px-6 md:px-12 h-[72px] flex items-center justify-between">
         <a href="/" className="font-newsreader italic text-2xl font-bold text-[#0A0A1A]">CreatorsBNB</a>
         <div className="flex gap-4">
-          <button onClick={() => navigate("/signin")} className="text-sm font-bold text-[#0A0A1A] hover:text-[#7C3AED] transition-colors">Sign In</button>
-          <button onClick={() => navigate("/signup")} className="px-5 py-2 rounded-full bg-gradient-to-r from-[#7C3AED] to-[#06B6D4] text-white text-sm font-bold">Sign Up</button>
+          {user ? (
+            <div className="flex items-center gap-3">
+              <span className="text-sm font-bold text-[#0A0A1A]">{profile?.full_name?.split(' ')[0] || 'Account'}</span>
+              <button onClick={handleSignOut} className="px-5 py-2 rounded-full border border-[#7C3AED] text-[#7C3AED] text-sm font-bold hover:bg-[#7C3AED] hover:text-white transition-all">Sign Out</button>
+            </div>
+          ) : (
+            <>
+              <button onClick={() => navigate("/signin")} className="text-sm font-bold text-[#0A0A1A] hover:text-[#7C3AED] transition-colors">Sign In</button>
+              <button onClick={() => navigate("/signup")} className="px-5 py-2 rounded-full bg-gradient-to-r from-[#7C3AED] to-[#06B6D4] text-white text-sm font-bold hover:shadow-[0_8px_20px_rgba(124,58,237,0.3)] transition-all">Sign Up</button>
+            </>
+          )}
         </div>
       </nav>
 

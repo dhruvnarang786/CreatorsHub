@@ -295,6 +295,46 @@ export const createEquipment = async (equipData: Record<string, unknown>) => {
   }
 }
 
+// ─── AVAILABILITY ───────────────────────────────────
+
+/** Get all unavailable dates for a specific studio */
+export const getStudioAvailability = async (studioId: string) => {
+  try {
+    const { data, error } = await supabase
+      .from('studio_availability')
+      .select('*')
+      .eq('studio_id', studioId)
+    if (error) throw error
+    return { data, error: null }
+  } catch (error) {
+    return { data: null, error }
+  }
+}
+
+/** Block or unblock a date for a studio */
+export const toggleStudioAvailability = async (studioId: string, date: string, isAvailable: boolean) => {
+  try {
+    if (isAvailable) {
+      // Remove from blocked dates
+      const { error } = await supabase
+        .from('studio_availability')
+        .delete()
+        .eq('studio_id', studioId)
+        .eq('date', date)
+      if (error) throw error
+    } else {
+      // Add to blocked dates
+      const { error } = await supabase
+        .from('studio_availability')
+        .insert([{ studio_id: studioId, date, reason: 'Manual Block' }])
+      if (error) throw error
+    }
+    return { success: true, error: null }
+  } catch (error) {
+    return { success: false, error }
+  }
+}
+
 // ─── STATS ─────────────────────────────────────────
 
 /** Get total earnings for a studio owner from confirmed/completed bookings */

@@ -4,7 +4,9 @@ import { ArrowLeft, MapPin, Loader2, SlidersHorizontal, Search } from "lucide-re
 import * as SliderPrimitive from "@radix-ui/react-slider";
 import { Calendar } from "@/components/ui/calendar";
 import { getStudios } from "@/services/supabase-service";
+import { useAuth } from '@/context/AuthContext';
 import { supabase } from "@/lib/supabase";
+import Logo from "@/components/Logo";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const PLACEHOLDER_STUDIOS = [
@@ -36,6 +38,8 @@ const StudioMarketplace = () => {
   const [studios, setStudios] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [cities, setCities] = useState<string[]>([]);
+  const { user, profile, signOut } = useAuth();
+  const handleSignOut = async () => { await signOut(); navigate('/'); };
 
   // Draft states (form UI)
   const [whereInput, setWhereInput] = useState("");
@@ -43,7 +47,7 @@ const StudioMarketplace = () => {
   const [whenMode, setWhenMode] = useState<"dates" | "flexible">("dates");
   const [flexibleDay, setFlexibleDay] = useState("Any");
   
-  const [draftPrice, setDraftPrice] = useState([0, 10000]);
+  const [draftPrice, setDraftPrice] = useState([500, 10000]);
   const [draftTypes, setDraftTypes] = useState<string[]>([]);
   const [draftSort, setDraftSort] = useState("relevant");
   const [draftAvailable, setDraftAvailable] = useState(false);
@@ -51,7 +55,7 @@ const StudioMarketplace = () => {
   // Applied states (controls the grid)
   const [appliedCity, setAppliedCity] = useState("");
   const [appliedDate, setAppliedDate] = useState<Date | undefined>();
-  const [appliedPrice, setAppliedPrice] = useState([0, 10000]);
+  const [appliedPrice, setAppliedPrice] = useState([500, 10000]);
   const [appliedTypes, setAppliedTypes] = useState<string[]>([]);
   const [appliedSort, setAppliedSort] = useState("relevant");
   const [appliedAvailable, setAppliedAvailable] = useState(false);
@@ -64,10 +68,31 @@ const StudioMarketplace = () => {
   const whereRef = useRef<HTMLDivElement>(null);
   const whenRef = useRef<HTMLDivElement>(null);
   const filterRef = useRef<HTMLDivElement>(null);
+  
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setStudios(PLACEHOLDER_STUDIOS);
+      setLoading(false);
+    }, 5000);
+
     getStudios().then(({ data }) => {
+      clearTimeout(timeout);
       setStudios(data && data.length > 0 ? data : PLACEHOLDER_STUDIOS);
+      setLoading(false);
+    }).catch(() => {
+      clearTimeout(timeout);
+      setStudios(PLACEHOLDER_STUDIOS);
       setLoading(false);
     });
   }, []);
@@ -115,14 +140,14 @@ const StudioMarketplace = () => {
     setSelectedDate(undefined);
     setWhenMode("dates");
     setFlexibleDay("Any");
-    setDraftPrice([0, 10000]);
+    setDraftPrice([500, 10000]);
     setDraftTypes([]);
     setDraftSort("relevant");
     setDraftAvailable(false);
     
     setAppliedCity("");
     setAppliedDate(undefined);
-    setAppliedPrice([0, 10000]);
+    setAppliedPrice([500, 10000]);
     setAppliedTypes([]);
     setAppliedSort("relevant");
     setAppliedAvailable(false);
@@ -162,7 +187,7 @@ const StudioMarketplace = () => {
   const filtered = filterAndSortStudios(studios);
   const filteredCities = cities.filter(c => c.toLowerCase().includes(whereInput.toLowerCase()));
 
-  const activeFilterCount = (appliedPrice[0] > 0 || appliedPrice[1] < 10000 ? 1 : 0) + appliedTypes.length + (appliedAvailable ? 1 : 0) + (appliedSort !== 'relevant' ? 1 : 0);
+  const activeFilterCount = (appliedPrice[0] > 500 || appliedPrice[1] < 10000 ? 1 : 0) + appliedTypes.length + (appliedAvailable ? 1 : 0) + (appliedSort !== 'relevant' ? 1 : 0);
 
   return (
     <div className="min-h-screen silver-shimmer-bg relative overflow-hidden" style={{ fontFamily: '"Manrope", sans-serif' }}>
@@ -170,10 +195,19 @@ const StudioMarketplace = () => {
       <div className="absolute -bottom-32 -left-32 w-[400px] h-[400px] rounded-full bg-[#06B6D4]/8 blur-[120px] pointer-events-none" />
 
       <nav className="sticky top-0 z-50 bg-[rgba(226,226,228,0.92)] backdrop-blur-xl border-b border-[rgba(0,0,0,0.06)] px-6 md:px-12 h-[72px] flex items-center justify-between">
-        <a href="/" className="font-newsreader italic text-2xl font-bold text-[#0A0A1A]">CreatorsBNB</a>
+        <Logo />
         <div className="flex gap-4">
-          <button onClick={() => navigate("/signin")} className="text-sm font-bold text-[#0A0A1A] hover:text-[#7C3AED] transition-colors">Sign In</button>
-          <button onClick={() => navigate("/signup")} className="px-5 py-2 rounded-full bg-gradient-to-r from-[#7C3AED] to-[#06B6D4] text-white text-sm font-bold hover:shadow-[0_8px_20px_rgba(124,58,237,0.3)] transition-all">Sign Up</button>
+          {user ? (
+            <div className="flex items-center gap-3">
+              <span className="text-sm font-bold text-[#0A0A1A]">{profile?.full_name?.split(' ')[0] || 'Account'}</span>
+              <button onClick={handleSignOut} className="px-5 py-2 rounded-full border border-[#7C3AED] text-[#7C3AED] text-sm font-bold hover:bg-[#7C3AED] hover:text-white transition-all">Sign Out</button>
+            </div>
+          ) : (
+            <>
+              <button onClick={() => navigate("/signin")} className="text-sm font-bold text-[#0A0A1A] hover:text-[#7C3AED] transition-colors">Sign In</button>
+              <button onClick={() => navigate("/signup")} className="px-5 py-2 rounded-full bg-gradient-to-r from-[#7C3AED] to-[#06B6D4] text-white text-sm font-bold hover:shadow-[0_8px_20px_rgba(124,58,237,0.3)] transition-all">Sign Up</button>
+            </>
+          )}
         </div>
       </nav>
 
@@ -234,7 +268,7 @@ const StudioMarketplace = () => {
               <div className="w-px bg-[#E5E7EB] my-3" />
 
               {/* WHEN Section */}
-              <div className="flex-1 relative" ref={whenRef}>
+              <div className="flex-1" ref={whenRef}>
                 <button 
                   className="w-full text-left px-6 py-4 hover:bg-gray-50 transition-colors flex flex-col items-start"
                   onClick={() => { setIsWhenOpen(true); setIsWhereOpen(false); setIsFilterOpen(false); }}
@@ -245,7 +279,8 @@ const StudioMarketplace = () => {
                   </span>
                 </button>
                 {isWhenOpen && (
-                  <div className="absolute top-full left-1/2 -translate-x-1/2 mt-4 bg-white rounded-3xl shadow-[0_20px_60px_rgba(0,0,0,0.12)] border border-[rgba(124,58,237,0.12)] p-6 z-50">
+                  <div className="absolute top-full left-1/2 -translate-x-1/2 mt-4 bg-white rounded-3xl shadow-[0_30px_70px_rgba(0,0,0,0.18)] border border-[rgba(124,58,237,0.12)] p-6 z-[100] animate-in fade-in zoom-in duration-200 w-max max-w-[90vw]">
+                    <div className="bg-white relative z-10">
                     <div className="flex justify-center mb-6">
                       <div className="flex bg-gray-100 p-1 rounded-full">
                         <button className={`px-5 py-1.5 rounded-full text-sm font-bold transition-all ${whenMode === 'dates' ? 'bg-white shadow text-[#0A0A1A]' : 'text-[#6B7280]'}`} onClick={() => setWhenMode('dates')}>Dates</button>
@@ -253,12 +288,12 @@ const StudioMarketplace = () => {
                       </div>
                     </div>
                     {whenMode === 'dates' ? (
-                      <div className="w-[600px] flex justify-center">
+                      <div className="w-full max-w-[600px] flex justify-center overflow-x-auto">
                         <Calendar 
                           mode="single" 
                           selected={selectedDate} 
                           onSelect={(d) => { setSelectedDate(d); setIsWhenOpen(false); handleApply(); }}
-                          numberOfMonths={2}
+                          numberOfMonths={isMobile ? 1 : 2}
                           disabled={(date) => date < new Date(new Date().setHours(0,0,0,0))}
                           classNames={{
                             day_selected: "bg-[#7C3AED] text-white hover:bg-[#7C3AED] hover:text-white focus:bg-[#7C3AED] focus:text-white",
@@ -267,7 +302,7 @@ const StudioMarketplace = () => {
                         />
                       </div>
                     ) : (
-                      <div className="w-[400px]">
+                      <div className="w-full max-w-[400px]">
                         <p className="text-sm font-bold text-[#0A0A1A] mb-4 text-center">How long?</p>
                         <div className="grid grid-cols-4 gap-3">
                           {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun", "Any"].map(day => (
@@ -283,7 +318,8 @@ const StudioMarketplace = () => {
                       </div>
                     )}
                   </div>
-                )}
+                </div>
+              )}
               </div>
 
               {/* SEARCH Button */}
@@ -322,7 +358,7 @@ const StudioMarketplace = () => {
                     <SliderPrimitive.Root
                       className="relative flex w-full touch-none select-none items-center"
                       value={draftPrice}
-                      min={0}
+                      min={500}
                       max={10000}
                       step={100}
                       onValueChange={setDraftPrice}
@@ -439,7 +475,7 @@ const StudioMarketplace = () => {
             </div>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {filtered.map((s) => (
-                <div key={s.id} onClick={() => s.id.startsWith("p") ? null : navigate(`/studio/${s.id}`)} className="rounded-2xl bg-white border border-[rgba(0,0,0,0.06)] shadow-[0_4px_20px_rgba(0,0,0,0.06)] overflow-hidden hover:-translate-y-1.5 hover:shadow-[0_20px_40px_rgba(124,58,237,0.12)] transition-all cursor-pointer group">
+                <div key={s.id} onClick={() => navigate(`/studio/${s.id}`)} className="rounded-2xl bg-white border border-[rgba(0,0,0,0.06)] shadow-[0_4px_20px_rgba(0,0,0,0.06)] overflow-hidden hover:-translate-y-1.5 hover:shadow-[0_20px_40px_rgba(124,58,237,0.12)] transition-all cursor-pointer group">
                   <div className="h-48 relative overflow-hidden">
                     {s.photos?.[0] ? (
                       <img src={s.photos[0]} alt={s.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />

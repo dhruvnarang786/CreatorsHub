@@ -267,74 +267,41 @@ body::after {
   100% { background-position: -200% 0; }
 }
 
-/* ═══ Showcase Gallery (5-Shape A-B-A-B-A Layout) ═══ */
+/* ═══ Showcase Gallery (6-Shape Horizontal Line Layout) ═══ */
 .showcase-gallery {
   display: flex;
-  align-items: center;
+  flex-direction: row;
   justify-content: center;
-  gap: 28px;
-  padding: 20px 0;
+  align-items: center;
+  gap: 32px;
+  padding: 10px 0;
+  flex-wrap: nowrap;
 }
 
-/* Type A shapes (1, 3, 5) — wider */
+/* All shapes */
 .showcase-shape {
-  width: 185px;
+  width: 190px;
   height: 320px;
-  border-radius: 24px;
-  border: 4px solid #000000;
   overflow: hidden;
   position: relative;
-  flex-shrink: 0;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.10);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
   transition: transform 0.4s cubic-bezier(0.4,0,0.2,1), box-shadow 0.4s ease;
+  flex-shrink: 0;
 }
 
 .showcase-shape:hover {
   transform: translateY(-8px) scale(1.04);
-  box-shadow: 0 16px 40px rgba(0,0,0,0.25), 0 4px 12px rgba(0,0,0,0.15);
+  box-shadow: 0 12px 24px rgba(0,0,0,0.25);
+  z-index: 20;
 }
 
-/* Type B shapes (2, 4) — narrower, same height */
-.showcase-shape.shape-type-b {
-  width: 160px;
-  height: 320px;
-}
-
-/* Center shape (3) — largest, hero focal point */
-.showcase-shape.center-shape {
-  width: 210px;
-  height: 370px;
-  box-shadow: 0 12px 32px rgba(0,0,0,0.22), 0 4px 12px rgba(0,0,0,0.12);
-}
-
-.showcase-shape.center-shape:hover {
-  box-shadow: 0 20px 48px rgba(0,0,0,0.30), 0 6px 16px rgba(0,0,0,0.18);
-}
-
-/* ─── Unique asymmetric border-radius per shape ─── */
-/* Shape 1: Rounded top-left + bottom-right (pill-ish diagonal) */
-.showcase-shape:nth-child(1) {
+/* ─── Asymmetric Border-Radius ─── */
+.showcase-shape:nth-child(odd) {
   border-radius: 48px 12px 48px 12px;
 }
 
-/* Shape 2: Rounded top-right + bottom-left */
-.showcase-shape:nth-child(2) {
+.showcase-shape:nth-child(even) {
   border-radius: 12px 48px 12px 48px;
-}
-
-/* Shape 3 (center): Full rounded top, straight bottom */
-.showcase-shape:nth-child(3) {
-  border-radius: 60px 60px 16px 16px;
-}
-
-/* Shape 4: Rounded bottom-right + top-left (mirror of shape 2) */
-.showcase-shape:nth-child(4) {
-  border-radius: 48px 12px 48px 12px;
-}
-
-/* Shape 5: Full rounded bottom, straight top */
-.showcase-shape:nth-child(5) {
-  border-radius: 16px 16px 60px 60px;
 }
 
 .showcase-shape video {
@@ -342,6 +309,8 @@ body::after {
   height: 100%;
   object-fit: cover;
   display: block;
+  position: relative;
+  z-index: 1;
 }
 
 /* Gradient fills for shapes (fallback behind video) */
@@ -351,23 +320,21 @@ body::after {
   z-index: 0;
 }
 
-.showcase-shape video {
-  position: relative;
-  z-index: 1;
-}
-
-.shape-gradient-1 { background: linear-gradient(180deg, #5A2D82 0%, #8B5FA8 100%); }
-.shape-gradient-2 { background: linear-gradient(180deg, #185FA5 0%, #4D90D4 100%); }
-.shape-gradient-3 { background: linear-gradient(180deg, #B85B35 0%, #E8845C 100%); }
-.shape-gradient-4 { background: linear-gradient(180deg, #8D3D60 0%, #C9658E 100%); }
-.shape-gradient-5 { background: linear-gradient(180deg, #4D7A1A 0%, #7BA940 100%); }
+/* Specific Gradients */
+.shape-gradient-1 { background: linear-gradient(180deg, #5A2D82 0%, #8B5FA8 100%); } /* Purple */
+.shape-gradient-2 { background: linear-gradient(180deg, #185FA5 0%, #4D90D4 100%); } /* Blue */
+.shape-gradient-3 { background: linear-gradient(180deg, #B85B35 0%, #E8845C 100%); } /* Orange */
+.shape-gradient-4 { background: linear-gradient(180deg, #4D7A1A 0%, #7BA940 100%); } /* Green */
+.shape-gradient-5 { background: linear-gradient(180deg, #B85B35 0%, #E8845C 100%); } /* Brown/Red */
+.shape-gradient-6 { background: linear-gradient(180deg, #6B7280 0%, #9CA3AF 100%); } /* Gray */
 
 /* Floating/Breathing Animations — staggered per shape */
-.showcase-shape:nth-child(1) { animation: floatBreath 4.5s ease-in-out infinite; }
-.showcase-shape:nth-child(2) { animation: floatBreath 5.0s ease-in-out 0.4s infinite; }
-.showcase-shape:nth-child(3) { animation: floatBreath 4.0s ease-in-out 0.8s infinite; }
-.showcase-shape:nth-child(4) { animation: floatBreath 5.5s ease-in-out 0.2s infinite; }
-.showcase-shape:nth-child(5) { animation: floatBreath 4.8s ease-in-out 0.6s infinite; }
+.showcase-shape:nth-child(1) { animation: floatBreath 3.0s ease-in-out 0.0s infinite; }
+.showcase-shape:nth-child(2) { animation: floatBreath 3.0s ease-in-out 0.4s infinite; }
+.showcase-shape:nth-child(3) { animation: floatBreath 3.0s ease-in-out 0.8s infinite; }
+.showcase-shape:nth-child(4) { animation: floatBreath 3.0s ease-in-out 1.2s infinite; }
+.showcase-shape:nth-child(5) { animation: floatBreath 3.0s ease-in-out 1.6s infinite; }
+.showcase-shape:nth-child(6) { animation: floatBreath 3.0s ease-in-out 2.0s infinite; }
 
 @keyframes floatBreath {
   0%, 100% { transform: translateY(0); }
@@ -379,67 +346,47 @@ body::after {
 }
 
 /* ═══ Responsive ═══ */
-@media (max-width: 1024px) {
+@media (max-width: 1280px) {
   .showcase-gallery {
-    gap: 18px;
+    gap: 25px;
   }
   .showcase-shape {
-    width: 150px;
-    height: 265px;
-  }
-  .showcase-shape.shape-type-b {
-    width: 130px;
-    height: 265px;
-  }
-  .showcase-shape.center-shape {
-    width: 170px;
+    width: 180px;
     height: 310px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .showcase-gallery {
+    gap: 15px;
+    overflow-x: auto;
+    justify-content: flex-start;
+    padding: 20px;
+  }
+  .showcase-shape {
+    width: 160px;
+    height: 280px;
   }
 }
 
 @media (max-width: 768px) {
   .showcase-gallery {
-    flex-wrap: wrap;
-    gap: 14px;
-    justify-content: center;
+    gap: 12px;
   }
   .showcase-shape {
-    width: 120px;
-    height: 210px;
-  }
-  .showcase-shape.shape-type-b {
-    width: 105px;
-    height: 210px;
-  }
-  .showcase-shape.center-shape {
     width: 140px;
-    height: 245px;
+    height: 240px;
   }
 }
 
 @media (max-width: 480px) {
   .showcase-gallery {
-    gap: 8px;
+    gap: 10px;
   }
   .showcase-shape {
-    width: 95px;
-    height: 165px;
-    border-width: 3px;
-  }
-  .showcase-shape.shape-type-b {
-    width: 80px;
-    height: 165px;
-  }
-  .showcase-shape.center-shape {
     width: 110px;
-    height: 195px;
+    height: 190px;
   }
-  /* Simplify radii on small screens */
-  .showcase-shape:nth-child(1) { border-radius: 32px 8px 32px 8px; }
-  .showcase-shape:nth-child(2) { border-radius: 8px 32px 8px 32px; }
-  .showcase-shape:nth-child(3) { border-radius: 40px 40px 12px 12px; }
-  .showcase-shape:nth-child(4) { border-radius: 32px 8px 32px 8px; }
-  .showcase-shape:nth-child(5) { border-radius: 12px 12px 40px 40px; }
 }
 
 /* Dropdown */

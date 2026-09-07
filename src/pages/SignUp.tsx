@@ -1,11 +1,13 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext'
+import Logo from '@/components/Logo'
 
 const SignUp = () => {
   const { signUp } = useAuth()
   const [fullName, setFullName] = useState('')
   const [email, setEmail] = useState('')
+  const [phone, setPhone] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [role, setRole] = useState<'creator' | 'studio_owner' | ''>('')
@@ -23,13 +25,14 @@ const SignUp = () => {
     // Validation
     if (!fullName.trim()) return setError('Full name is required.')
     if (!email.trim()) return setError('Email is required.')
+    if (!phone.trim()) return setError('Contact number is required.')
     if (password.length < 8) return setError('Password must be at least 8 characters.')
     if (password !== confirmPassword) return setError('Passwords do not match.')
     if (!role) return setError('Please select your role.')
     if (!agreedToTerms) return setError('You must agree to the Terms of Service.')
 
     setLoading(true)
-    const { error: authError } = await signUp(email, password, fullName, role)
+    const { error: authError } = await signUp(email, password, fullName, role, phone)
     setLoading(false)
 
     if (authError) {
@@ -76,9 +79,9 @@ const SignUp = () => {
       <div className="relative z-10 max-w-[520px] w-full bg-white border border-[rgba(124,58,237,0.12)] rounded-3xl p-12 shadow-[0_20px_60px_rgba(124,58,237,0.08),0_4px_20px_rgba(0,0,0,0.06)]">
         {/* Header */}
         <div className="text-center space-y-3 mb-8">
-          <Link to="/" className="font-newsreader italic text-3xl font-bold text-[#0A0A1A] logo-shimmer inline-block">
-            CreatorsBNB
-          </Link>
+          <div className="flex justify-center mb-2">
+            <Logo size="lg" />
+          </div>
           <h1 className="text-2xl font-bold text-[#0A0A1A]" style={{ fontFamily: '"Newsreader", serif' }}>Create your account</h1>
           <p className="text-[#6B7280] text-sm">Join the creator marketplace</p>
         </div>
@@ -103,6 +106,12 @@ const SignUp = () => {
           <div className="space-y-2">
             <label className="text-sm font-semibold text-[#374151]">Email</label>
             <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" className={inputClass} required />
+          </div>
+
+          {/* Contact Number */}
+          <div className="space-y-2">
+            <label className="text-sm font-semibold text-[#374151]">Contact Number</label>
+            <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+91 9876543210" className={inputClass} required />
           </div>
 
           {/* Password */}

@@ -18,7 +18,7 @@ interface AuthContextType {
   user: User | null
   profile: Profile | null
   loading: boolean
-  signUp: (email: string, password: string, fullName: string, role: string) => Promise<{ data: any; error: any }>
+  signUp: (email: string, password: string, fullName: string, role: string, phone: string) => Promise<{ data: any; error: any }>
   signIn: (email: string, password: string) => Promise<{ data: any; error: any }>
   signOut: () => Promise<void>
   fetchProfile: (userId: string) => Promise<void>
@@ -40,11 +40,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    // Safety timeout — if Supabase hangs, clear loading after 3s
+    const timeout = setTimeout(() => setLoading(false), 3000)
+
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null)
       if (session?.user) fetchProfile(session.user.id)
       setLoading(false)
+      clearTimeout(timeout)
     })
 
     // Listen for auth changes
@@ -63,20 +67,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, [])
 
   const fetchProfile = async (userId: string) => {
-    const { data } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .single()
-    setProfile(data as Profile | null)
+    try {
+      const { data } = await Promise.race([
+        supabase.from('profiles').select('*').eq('id', userId).single(),
+        new Promise<{ data: null; error: Error }>((resolve) =>
+          setTimeout(() => resolve({ data: null, error: new Error('timeout') }), 4000)
+        )
+      ])
+      setProfile(data as Profile | null)
+    } catch {
+      setProfile(null)
+    }
   }
 
-  const signUp = async (email: string, password: string, fullName: string, role: string) => {
+  const signUp = async (email: string, password: string, fullName: string, role: string, phone: string) => {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        data: { full_name: fullName, role },
+        data: { full_name: fullName, role, phone },
         emailRedirectTo: `${window.location.origin}/auth/callback`
       }
     })
@@ -99,7 +108,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <AuthContext.Provider value={{ user, profile, loading, signUp, signIn, signOut, fetchProfile }}>
-      {!loading && children}
+      {children}
     </AuthContext.Provider>
   )
 }

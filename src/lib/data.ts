@@ -23,8 +23,8 @@ export const registrationConfig: Record<string, {
   "list-studio": {
     heading: "List Your Studio",
     description: "Add your studio details so creators can discover, shortlist, and book your space.",
-    fields: [["Studio Name", "Business / Owner Name"], ["City", "Area / Address"], ["Price Per Hour", "Capacity"], ["Equipment Included", "Available Days"]],
-    textarea: "Describe your studio, setup, aesthetics, and the types of shoots it is ideal for.",
+    fields: [["Full Name", "Email ID"], ["Contact Number", "Base Price (Hourly)"], ["Full Address", "Google Map Pin Link"], ["Government ID (Aadhar/PAN)", "Studio Name / Business Name"]],
+    textarea: "Provide details about the place (e.g., Podcast space, Kitchen area, lighting equipment, etc.)",
   },
   "register-videographer": {
     heading: "Register as Videographer",
@@ -41,7 +41,7 @@ export const registrationConfig: Record<string, {
   "list-equipment": {
     heading: "List Equipment",
     description: "Add your camera, lighting, or audio gear for rental and let creators book what they need.",
-    fields: [["Equipment Name", "Owner Name"], ["City", "Pickup / Delivery Option"], ["Price Per Day", "Security Deposit"], ["Included Accessories", "Availability"]],
+    fields: [["Owner Name", "Email ID"], ["Contact Number", "Government ID"], ["Equipment to Offer", "Price Per Day"], ["Address Pick up point", "Google Map Pin Link"], ["Security Deposit", "Availability"]],
     textarea: "Describe the equipment condition, ideal use cases, brand / model details, and rental rules.",
   },
 };

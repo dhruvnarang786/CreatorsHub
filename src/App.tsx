@@ -32,6 +32,7 @@ import AuthCallback from "./pages/AuthCallback";
 // Dashboard Pages
 import CreatorDashboard from "./pages/CreatorDashboard";
 import OwnerDashboard from "./pages/OwnerDashboard";
+import AdminDashboard from "./pages/AdminDashboard";
 
 const queryClient = new QueryClient();
 
@@ -84,7 +85,7 @@ const App = () => (
             <Route
               path="/dashboard/creator"
               element={
-                <ProtectedRoute requiredRole="creator">
+                <ProtectedRoute>
                   <CreatorDashboard />
                 </ProtectedRoute>
               }
@@ -92,11 +93,13 @@ const App = () => (
             <Route
               path="/dashboard/owner"
               element={
-                <ProtectedRoute requiredRole="studio_owner">
+                <ProtectedRoute>
                   <OwnerDashboard />
                 </ProtectedRoute>
               }
             />
+
+            <Route path="/admin/approvals" element={<AdminDashboard />} />
 
             {/* Catch All */}
             <Route path="*" element={<NotFound />} />

@@ -1,6 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { getTrendingStudios, getTrendingProfessionals } from "@/services/supabase-service";
+import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/context/AuthContext";
+import { MapPin, Search, Users, Camera, Building2, Sparkles, Rocket, Smile, CalendarDays, Home, Video, Clapperboard, Briefcase, Presentation, UserPlus, Edit, Box, ArrowRight } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
+import Logo from "@/components/Logo";
 
 const SHOWCASE_VIDEOS = [
   "https://res.cloudinary.com/drulic8e0/video/upload/v1776249407/14478811_1080_1920_30fps_e1w0ct.mp4",
@@ -8,6 +13,7 @@ const SHOWCASE_VIDEOS = [
   "https://res.cloudinary.com/drulic8e0/video/upload/v1776798733/15422875_1080_1920_30fps_dnzlsc.mp4",
   "https://res.cloudinary.com/drulic8e0/video/upload/v1778009814/3917780-uhd_2160_4096_25fps_a2r4y9.mp4",
   "https://res.cloudinary.com/drulic8e0/video/upload/v1778009855/14961399_2160_3840_50fps_xxfkws.mp4",
+  "https://res.cloudinary.com/drulic8e0/video/upload/v1778241052/9441682-uhd_2160_3840_30fps_c16fgl.mp4",
 ];
 
 const SHAPE_GRADIENTS = [
@@ -16,6 +22,7 @@ const SHAPE_GRADIENTS = [
   "shape-gradient-3",
   "shape-gradient-4",
   "shape-gradient-5",
+  "shape-gradient-6",
 ];
 
 const COLORS = ["primary", "secondary", "tertiary", "primary"];
@@ -58,6 +65,68 @@ function ProfileCard({ name, location, price, rating, img, accentClass = "text-[
 const Index = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const navigateTo = useNavigate();
+  const { user, profile, signOut } = useAuth();
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const userMenuRef = useRef<HTMLDivElement>(null);
+
+  // Search Bar State
+  const [whereInput, setWhereInput] = useState("");
+  const [isWhereOpen, setIsWhereOpen] = useState(false);
+  const [cities, setCities] = useState<string[]>([]);
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>();
+  const [isWhenOpen, setIsWhenOpen] = useState(false);
+  const whereRef = useRef<HTMLDivElement>(null);
+  const whenRef = useRef<HTMLDivElement>(null);
+  const [isSearchExpanded, setIsSearchExpanded] = useState(false);
+  const [navSearchQuery, setNavSearchQuery] = useState("");
+
+  useEffect(() => {
+    const fetchCities = async () => {
+      const { data } = await supabase.from('studios').select('city').eq('is_approved', true).eq('is_active', true);
+      if (data) {
+        const uniqueCities = [...new Set(data.map(s => s.city))].filter(Boolean).sort();
+        setCities(uniqueCities as string[]);
+      }
+    };
+    fetchCities();
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Node;
+      if (whereRef.current && !whereRef.current.contains(target)) setIsWhereOpen(false);
+      if (whenRef.current && !whenRef.current.contains(target)) setIsWhenOpen(false);
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Close user menu on outside click
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+        setIsUserMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleSignOut = async () => {
+    await signOut();
+    setIsUserMenuOpen(false);
+  };
+
+  const handleSearchSubmit = () => {
+    navigateTo(`/studios?city=${encodeURIComponent(whereInput)}`);
+  };
+
+  const handleNavSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (navSearchQuery.trim()) {
+      navigateTo(`/studios?search=${encodeURIComponent(navSearchQuery.trim())}`);
+    }
+  };
 
   // Supabase trending data
   const [trendingStudios, setTrendingStudios] = useState<any[]>([]);
@@ -88,18 +157,19 @@ const Index = () => {
       <div className="fixed inset-0 grain-overlay z-[60] pointer-events-none" />
 
       {/* ═══ NAVIGATION ═══ */}
-      <nav className="fixed top-0 w-full z-50 bg-[rgba(226,226,228,0.92)] backdrop-blur-2xl flex justify-between items-center px-6 md:px-12 h-[72px] max-w-full border-b border-[rgba(0,0,0,0.06)]">
-        <a className="font-newsreader italic text-2xl font-bold text-[#0A0A1A] logo-shimmer transition-all" href="#hero">CreatorsBNB</a>
-        <div className="hidden md:flex gap-10 text-[15px] font-bold tracking-tight h-full items-center">
-          <a className="text-[#0A0A1A] hover:text-[#702ae1] transition-colors" href="#hero">Home</a>
-          <a className="text-[#0A0A1A] hover:text-[#702ae1] transition-colors" href="#about-us">About Us</a>
+      <nav className="fixed top-0 w-full z-[100] bg-[rgba(226,226,228,0.92)] backdrop-blur-2xl flex justify-between items-center px-[30px] py-[20px] h-[80px] max-w-full border-b border-[rgba(0,0,0,0.06)]">
+        <Logo size="lg" />
+        
+        <div className="hidden md:flex gap-[20px] text-[18px] font-bold tracking-tight h-full items-center px-4">
+          <a className="text-[#000000] font-bold underline decoration-2 underline-offset-4 transition-colors whitespace-nowrap" href="#hero">Home</a>
+          <a className="text-[#6B46C1] hover:text-[#000000] transition-colors whitespace-nowrap" href="#find-best-studios">About Us</a>
           <div
             className="relative h-full flex items-center group"
             onMouseEnter={() => setIsDropdownOpen(true)}
             onMouseLeave={() => setIsDropdownOpen(false)}
           >
-            <button className="text-[#0A0A1A] group-hover:text-[#702ae1] transition-colors flex items-center gap-1">
-              Services <span className="material-symbols-outlined text-[18px]">expand_more</span>
+            <button className="text-[#6B46C1] group-hover:text-[#000000] transition-colors flex items-center gap-1 whitespace-nowrap">
+              Services <span className="material-symbols-outlined text-[20px]">expand_more</span>
             </button>
             {isDropdownOpen && (
               <div className="absolute top-full -left-20 w-[420px] bg-white border border-gray-100 rounded-2xl shadow-2xl p-6 flex flex-row gap-8">
@@ -127,7 +197,7 @@ const Index = () => {
                 <div className="flex-1">
                   <p className="text-[11px] font-black uppercase tracking-[2px] text-cyan-600 mb-4">I Want to List</p>
                   <div className="space-y-4">
-                    <div className="block group/item cursor-pointer" onClick={() => { setIsDropdownOpen(false); navigateTo('/studios/list'); }}>
+                    <div className="block group/item cursor-pointer" onClick={() => { setIsDropdownOpen(false); navigateTo('/register/list-studio'); }}>
                       <p className="text-sm font-bold text-gray-900 group-hover/item:text-[#006576]">List Studio Space</p>
                       <p className="text-[11px] text-gray-500 font-medium">Monetize your creative studio</p>
                     </div>
@@ -139,7 +209,7 @@ const Index = () => {
                       <p className="text-sm font-bold text-gray-900 group-hover/item:text-[#006576]">As a Photographer</p>
                       <p className="text-[11px] text-gray-500 font-medium">Offer your photography</p>
                     </div>
-                    <div className="block group/item cursor-pointer" onClick={() => { setIsDropdownOpen(false); navigateTo('/equipment/list'); }}>
+                    <div className="block group/item cursor-pointer" onClick={() => { setIsDropdownOpen(false); navigateTo('/register/list-equipment'); }}>
                       <p className="text-sm font-bold text-gray-900 group-hover/item:text-[#006576]">List Equipment</p>
                       <p className="text-[11px] text-gray-500 font-medium">Rent out your gear</p>
                     </div>
@@ -148,162 +218,347 @@ const Index = () => {
               </div>
             )}
           </div>
-          <a className="text-[#0A0A1A] hover:text-[#702ae1] transition-colors cursor-pointer" onClick={() => navigateTo('/influencer-discovery')}>Influencer Discovery</a>
-          <a className="text-[#0A0A1A] hover:text-[#702ae1] transition-colors" href="#footer">Contact Us</a>
+          <a className="text-[#6B46C1] hover:text-[#000000] transition-colors cursor-pointer whitespace-nowrap" onClick={() => navigateTo('/influencer-discovery')}>Influencer Discovery</a>
+          <a className="text-[#6B46C1] hover:text-[#000000] transition-colors whitespace-nowrap" href="#footer">Contact Us</a>
+
+          {/* ═══ NAVBAR SEARCH BAR ═══ */}
+          <form onSubmit={handleNavSearchSubmit} className="ml-[10px] flex items-center bg-[#FFFFFF] rounded-[20px] border border-[#CCCCCC] pl-[12px] pr-[5px] h-[40px] w-[200px] shrink-0">
+            <input 
+              type="text" 
+              value={navSearchQuery}
+              onChange={(e) => setNavSearchQuery(e.target.value)}
+              placeholder="Search your studio" 
+              className="bg-transparent border-none outline-none text-[14px] w-full text-[#555555] placeholder:text-[#CCCCCC]"
+            />
+            <button type="submit" className="w-[30px] h-[30px] rounded-full bg-[#6B46C1] text-white flex items-center justify-center shrink-0 cursor-pointer">
+              <Search className="w-[14px] h-[14px]" />
+            </button>
+          </form>
         </div>
-        <div className="flex items-center gap-4">
-          <button onClick={() => navigateTo('/signin')} className="text-[#0A0A1A] font-bold text-[14px] px-5 py-2 hover:opacity-70 transition-opacity">Sign In</button>
-          <button onClick={() => navigateTo('/signup')} className="bg-gradient-to-r from-[#702ae1] to-[#006576] text-white px-7 py-2.5 rounded-full font-bold text-[14px] hover:shadow-[0_8px_20px_rgba(112,42,225,0.3)] hover:-translate-y-0.5 transition-all">
-            Sign Up
-          </button>
+
+        <div className="flex items-center gap-[15px] shrink-0">
+          {user ? (
+            <div ref={userMenuRef} className="relative">
+              <button
+                onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                className="flex items-center gap-3 bg-white/80 border border-[rgba(124,58,237,0.2)] rounded-full pl-4 pr-2 py-2 hover:border-[#7C3AED] transition-all"
+              >
+                <span className="text-[15px] font-bold text-[#0A0A1A] whitespace-nowrap">{profile?.full_name?.split(' ')[0] || 'Account'}</span>
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#702ae1] to-[#06B6D4] flex items-center justify-center text-white font-bold text-sm shrink-0">
+                  {profile?.full_name?.charAt(0)?.toUpperCase() || user.email?.charAt(0)?.toUpperCase() || 'U'}
+                </div>
+              </button>
+              {isUserMenuOpen && (
+                <div className="absolute right-0 top-full mt-2 w-52 bg-white border border-gray-100 rounded-2xl shadow-2xl p-3 z-[400]">
+                  <div className="px-3 py-2 mb-1 border-b border-gray-100">
+                    <p className="text-sm font-bold text-[#0A0A1A] truncate">{profile?.full_name || 'User'}</p>
+                    <p className="text-xs text-gray-400 truncate capitalize">{profile?.role?.replace('_', ' ') || 'Member'}</p>
+                  </div>
+                  <button
+                    onClick={() => { navigateTo(profile?.role === 'studio_owner' ? '/dashboard/owner' : '/dashboard/creator'); setIsUserMenuOpen(false); }}
+                    className="w-full text-left px-3 py-2.5 rounded-xl text-sm font-bold text-[#0A0A1A] hover:bg-violet-50 hover:text-[#7C3AED] transition-colors"
+                  >
+                    My Dashboard
+                  </button>
+                  <button
+                    onClick={handleSignOut}
+                    className="w-full text-left px-3 py-2.5 rounded-xl text-sm font-bold text-red-500 hover:bg-red-50 transition-colors"
+                  >
+                    Sign Out
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <>
+              <button onClick={() => navigateTo('/signin')} className="text-[#0A0A1A] font-bold text-[18px] px-3 py-2 hover:opacity-70 transition-opacity whitespace-nowrap">Sign In</button>
+              <button onClick={() => navigateTo('/signup')} className="bg-gradient-to-r from-[#702ae1] to-[#006576] text-white px-6 py-2.5 rounded-full font-bold text-[18px] hover:shadow-[0_8px_20px_rgba(112,42,225,0.3)] hover:-translate-y-0.5 transition-all whitespace-nowrap">
+                Sign Up
+              </button>
+            </>
+          )}
         </div>
       </nav>
 
       {/* ═══ HERO SECTION ═══ */}
-      <section className="relative min-h-screen pt-28 pb-20 px-6 md:px-8 flex flex-col items-center overflow-hidden" id="hero">
-        {/* 5-Shape Showcase Gallery */}
-        <div className="showcase-gallery z-10 mt-8">
-          {SHOWCASE_VIDEOS.map((src, idx) => {
-            const shapeClass = idx === 2 ? 'center-shape' : (idx === 1 || idx === 3) ? 'shape-type-b' : '';
-            return (
-              <div key={idx} className={`showcase-shape ${shapeClass}`}>
-                <div className={`gradient-fill ${SHAPE_GRADIENTS[idx]}`} />
+      <section className="relative min-h-screen pt-[90px] pb-10 px-6 md:px-12 flex flex-col items-center overflow-visible" id="hero">
+        
+        {/* 1. Shapes (Full Width, Top) */}
+        <div className="showcase-gallery z-10 w-full mb-8 overflow-x-auto md:overflow-visible">
+          {SHOWCASE_VIDEOS.map((src, idx) => (
+            <div key={idx} className="showcase-shape">
+              <div className={`gradient-fill ${SHAPE_GRADIENTS[idx]}`} />
+              {src && (
                 <video autoPlay className="w-full h-full object-cover" loop muted playsInline>
                   <source src={src} type="video/mp4" />
                 </video>
+              )}
+            </div>
+          ))}
+        </div>
+
+        {/* 2. Content Container (Two Column Layout Below Shapes) */}
+        <div className="w-full max-w-[1200px] flex flex-col lg:flex-row items-start justify-between gap-10 lg:gap-16 z-20">
+          
+          {/* Left Side: Tag + Heading */}
+          <div className="flex-1 text-left lg:pt-2">
+            <div className="inline-block px-4 py-1.5 rounded-full bg-[#EBE4FF] text-[#6B46C1] text-[12px] font-black uppercase tracking-[2px] mb-6 shadow-sm">
+              #Built for creators and brands
+            </div>
+            <h1 className="text-[48px] md:text-[58px] lg:text-[64px] font-bold text-[#0A0A1A] leading-[1.1] tracking-tight mb-6" style={{ fontFamily: '"Newsreader", serif' }}>
+              Elevate your content game with <span className="italic">CreatorsBNB</span>
+            </h1>
+          </div>
+
+          {/* Right Side: Airbnb-style Search Bar */}
+          <div className="flex-1 w-full flex flex-col lg:items-end justify-center lg:pt-12">
+            <div className="w-full max-w-[500px] relative" style={{ fontFamily: '"Manrope", sans-serif' }}>
+              <div className="flex items-center bg-white/95 rounded-[12px] shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-[#E5E7EB] h-[56px] w-full relative">
+                
+                {/* Where Section */}
+                <div ref={whereRef} className="flex-1 h-full border-r border-[#E5E7EB] relative group">
+                  <button onClick={() => setIsWhereOpen(!isWhereOpen)} className="w-full h-full text-left flex flex-col justify-center px-5 hover:bg-gray-50/80 transition-colors rounded-l-[12px]">
+                    <span className="text-[11px] font-black text-[#0A0A1A] uppercase tracking-wider leading-tight mb-0.5">Where</span>
+                    <span className={`text-[13px] truncate w-full leading-tight font-bold ${whereInput ? 'text-[#0A0A1A]' : 'text-[#9CA3AF]'}`}>{whereInput || 'Search studios'}</span>
+                  </button>
+                  {isWhereOpen && (
+                    <div className="absolute top-[110%] left-0 w-[300px] bg-white border border-[#E5E7EB] rounded-[16px] shadow-2xl p-4 z-50 max-h-[280px] overflow-y-auto">
+                      <p className="text-[10px] font-black text-[#9CA3AF] mb-2 px-2 uppercase tracking-widest">Suggested Cities</p>
+                      {cities.map((city) => (
+                        <button 
+                          key={city} 
+                          onClick={() => { setWhereInput(city); setIsWhereOpen(false); }}
+                          className="w-full flex items-center gap-2 px-3 py-2.5 rounded-[10px] hover:bg-violet-50 transition-colors text-left group/city"
+                        >
+                          <MapPin className="w-3.5 h-3.5 text-gray-400 group-hover/city:text-violet-600" />
+                          <span className="text-[14px] font-bold text-[#0A0A1A] group-hover/city:text-violet-700">{city}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* When Section */}
+                <div ref={whenRef} className="flex-[0.7] h-full border-r border-[#E5E7EB] group">
+                  <button onClick={() => setIsWhenOpen(!isWhenOpen)} className="w-full h-full text-left flex flex-col justify-center px-5 hover:bg-gray-50/80 transition-colors">
+                    <span className="text-[11px] font-black text-[#0A0A1A] uppercase tracking-wider leading-tight mb-0.5">When</span>
+                    <span className={`text-[13px] truncate w-full leading-tight font-bold ${selectedDate ? 'text-[#0A0A1A]' : 'text-[#9CA3AF]'}`}>{selectedDate ? selectedDate.toLocaleDateString() : 'Add dates'}</span>
+                  </button>
+                  {isWhenOpen && (
+                    <div className="absolute top-[120%] left-1/2 -translate-x-1/2 bg-white/100 border border-[#E5E7EB] rounded-[24px] shadow-[0_30px_70px_rgba(0,0,0,0.2)] p-4 z-[1000] animate-in fade-in zoom-in duration-200 backdrop-blur-xl">
+                      <div className="relative z-10 bg-white rounded-xl shadow-inner">
+                        <Calendar
+                          mode="single"
+                          selected={selectedDate}
+                          onSelect={(date) => { setSelectedDate(date); setIsWhenOpen(false); }}
+                          disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+                          initialFocus
+                          className="bg-white"
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Search Button */}
+                <button 
+                  onClick={handleSearchSubmit}
+                  className="w-[56px] h-full bg-[#6B46C1] text-white flex items-center justify-center hover:bg-[#5A39A8] transition-all rounded-r-[12px] shrink-0 cursor-pointer"
+                >
+                  <Search className="w-5 h-5 stroke-[2.5]" />
+                </button>
               </div>
-            );
-          })}
-        </div>
-
-        {/* Text Section Below Shapes */}
-        <div className="z-10 text-center mt-12 max-w-2xl mx-auto space-y-6">
-          <h1 className="text-4xl md:text-[48px] font-extrabold leading-[1.15] tracking-tight text-[#000000]" style={{ fontFamily: '"Newsreader", serif' }}>
-            Your Creative Space, On Demand.
-          </h1>
-          <p className="text-[#6b6b6b] text-base md:text-[16px] leading-relaxed max-w-xl mx-auto" style={{ fontFamily: '"Manrope", sans-serif' }}>
-            Unlock high-end production environments. From minimalist editorial lofts to neon-drenched sound stages, find your next masterpiece's birthplace.
-          </p>
-          <div className="flex flex-wrap gap-4 pt-2 justify-center">
-            <button onClick={() => navigateTo('/studios')} className="px-8 py-4 rounded-full bg-gradient-to-r from-[#702ae1] to-[#006576] text-white font-bold text-lg hover:scale-105 transition-all duration-300 neon-pulse-shadow group flex items-center">
-              Find a Studio <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
-            </button>
-            <button onClick={() => navigateTo('/register/list-studio')} className="px-8 py-4 rounded-full border-2 border-[#000000] font-bold text-lg hover:bg-[#f0f1f1] transition-colors text-[#000000]">
-              List Your Space
-            </button>
-          </div>
-          <div className="flex gap-12 pt-6 justify-center">
-            <div className="space-y-1 text-center">
-              <p className="font-headline italic text-3xl font-bold bg-gradient-to-br from-[#702ae1] to-[#006576] bg-clip-text text-transparent" style={{ fontFamily: '"Newsreader", serif' }}>12K+</p>
-              <p className="text-xs font-bold uppercase tracking-widest text-[#5a5c5c] opacity-60">Studios</p>
-            </div>
-            <div className="space-y-1 text-center">
-              <p className="font-headline italic text-3xl font-bold bg-gradient-to-br from-[#702ae1] to-[#b00d6a] bg-clip-text text-transparent" style={{ fontFamily: '"Newsreader", serif' }}>50K+</p>
-              <p className="text-xs font-bold uppercase tracking-widest text-[#5a5c5c] opacity-60">Creators</p>
-            </div>
-            <div className="space-y-1 text-center">
-              <p className="font-headline italic text-3xl font-bold bg-gradient-to-br from-[#006576] to-[#b00d6a] bg-clip-text text-transparent" style={{ fontFamily: '"Newsreader", serif' }}>98%</p>
-              <p className="text-xs font-bold uppercase tracking-widest text-[#5a5c5c] opacity-60">Satisfaction</p>
+              <p className="mt-4 text-[16px] text-[#555555] font-medium text-center lg:text-right px-2 leading-relaxed">
+                Find inspiring studios, expert videographers, and professional gear—all in one place.
+              </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ═══ ABOUT US ═══ */}
-      <section className="relative py-20 md:py-24 px-6 md:px-10 overflow-hidden" id="about-us">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-10 md:gap-16">
-          {/* Left Column — Image */}
-          <div className="w-full md:w-[45%] flex-shrink-0">
-            <img
-              src="/creators-collab.png"
-              alt="Diverse group of content creators collaborating on a production shoot in a professional studio space"
-              className="w-full h-auto rounded-[28px] shadow-[0_10px_30px_rgba(0,0,0,0.1)] border border-[#E0E0E0]"
-              style={{ maxHeight: 550 }}
-            />
-          </div>
-          {/* Right Column — Text */}
-          <div className="w-full md:w-[55%]">
-            <p className="text-xs md:text-sm font-bold uppercase tracking-[1px] text-[#000000] mb-4" style={{ fontFamily: '"Manrope", sans-serif' }}>#ABOUT US</p>
-            <h2 className="text-3xl md:text-[48px] font-bold leading-[1.2] text-[#000000] mb-8" style={{ fontFamily: '"Newsreader", serif' }}>Get To Know Us</h2>
-            <div className="space-y-4 max-w-[550px]" style={{ fontFamily: '"Manrope", sans-serif' }}>
-              <p className="text-[15px] md:text-[16px] font-bold text-[#000000] leading-[1.7]">
-                CreatorsBNB — where Creators find the best ecosystem for their shoots! Built for the next generation of creators, CreatorsBNB connects content creators with inspiring studios, production spaces, and unique shoot locations — making it effortless to find, book, and create.
-              </p>
-              <p className="text-[15px] md:text-[16px] font-bold text-[#000000] leading-[1.7]">
-                Whether it's an instagram reel shoot, fashion campaign, YouTube production, or brand shoot, we help creators unlock the perfect environment to bring ideas to life.
-              </p>
-              <p className="text-[15px] md:text-[16px] font-bold text-[#000000] leading-[1.7]">
-                At the same time, we empower studio owners to transform their spaces into thriving creative destinations.
-              </p>
-              <p className="text-[15px] md:text-[16px] font-bold text-[#000000] leading-[1.7]">
-                CreatorsBNB isn't just a booking platform — it's the ecosystem powering the future of content creation.
-              </p>
-              <p className="text-[15px] md:text-[16px] font-extrabold text-[#000000] leading-[1.7]">
-                Create bigger. Shoot smarter. Book better.
-              </p>
-            </div>
-            <button
-              onClick={() => navigateTo('/studios')}
-              className="mt-8 px-8 py-3 rounded-full bg-[#000000] text-white font-bold text-[15px] hover:opacity-80 hover:scale-[1.02] transition-all duration-300 flex items-center group"
-            >
-              Connect Now <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
-            </button>
-          </div>
-        </div>
-      </section>
 
       {/* ═══ FIND YOUR VIBE ═══ */}
-      <section className="relative py-32 px-6 md:px-8 overflow-hidden" id="find-your-vibe">
-        <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-[#702ae1] to-transparent opacity-50 pointer-events-none" />
-        <div className="absolute -bottom-24 -right-24 w-[500px] h-[500px] bg-[#702ae1]/5 blur-[150px] rounded-full pointer-events-none" />
-        <div className="max-w-7xl mx-auto">
-          <h2 className="font-headline text-5xl font-bold mb-16 text-center" style={{ fontFamily: '"Newsreader", serif' }}>
-            <span className="font-black text-6xl text-[#000000]">Find your vibe.</span>
-          </h2>
-          <div className="grid md:grid-cols-2 gap-8">
-            {/* Card 1: I Want to Find */}
-            <div className="group relative bg-[#F8F8FC] p-12 rounded-[2.5rem] overflow-hidden border border-[#702ae1]/5 hover:scale-[1.02] transition-all duration-500 hover:shadow-2xl hover:shadow-[#702ae1]/10">
-              <div className="relative z-10">
-                <h3 className="font-newsreader text-5xl font-bold text-[#000000] mb-8">I Want to Find</h3>
-                <div className="space-y-6">
-                  {[
-                    { icon: "camera_indoor", label: "Studio Space", path: "/studios" },
-                    { icon: "videocam", label: "Videographer", path: "/professionals?type=videographer" },
-                    { icon: "movie_edit", label: "Video Editor", path: "/professionals?type=editor" },
-                    { icon: "home_repair_service", label: "Casting Equipment", path: "/equipment" },
-                  ].map((item) => (
-                    <div key={item.label} onClick={() => navigateTo(item.path)} className="flex items-center gap-6 p-4 rounded-2xl hover:bg-white transition-colors cursor-pointer">
-                      <div className="w-14 h-14 rounded-2xl bg-[#b28cff] flex items-center justify-center text-[#702ae1]">
-                        <span className="material-symbols-outlined">{item.icon}</span>
+      <section className="relative py-[80px] px-6 overflow-hidden" id="find-your-vibe">
+        <div className="max-w-[1000px] mx-auto flex flex-col items-center relative z-10">
+          
+          {/* Heading */}
+          <div className="flex flex-col items-center mb-[30px] text-center">
+            <h2 className="text-[48px] md:text-[64px] font-bold text-[#000000] tracking-tight leading-none mb-[16px]" style={{ fontFamily: '"Newsreader", serif' }}>
+              Find your vibe.
+            </h2>
+            
+            {/* Sparkle Separator */}
+            <div className="flex items-center gap-[12px]">
+              <div className="w-[60px] h-[1.5px] bg-[#6B46C1]/30"></div>
+              <Sparkles className="w-[18px] h-[18px] text-[#6B46C1] fill-[#6B46C1]/20" />
+              <div className="w-[60px] h-[1.5px] bg-[#6B46C1]/30"></div>
+            </div>
+          </div>
+
+          {/* Show both cards if not logged in, or just the relevant one based on role */}
+          <div className={`w-full gap-[30px] place-items-center items-start ${
+            !user || (profile?.role !== 'creator' && profile?.role !== 'studio_owner')
+              ? 'grid md:grid-cols-2'
+              : 'flex justify-center'
+          }`}>
+            
+            {/* Card 1: I Want to Find — shown to guests and creators */}
+            {(!user || profile?.role === 'creator') && (
+            <div className="w-full max-w-[420px] bg-[#FFFFFF] rounded-[24px] p-[32px] shadow-[0_4px_24px_rgba(0,0,0,0.04)] border border-[#F3F4F6]">
+              <div className="mb-[24px]">
+                <h3 className="font-newsreader italic text-[28px] font-bold text-[#0A0A1A] mb-[12px]">I Want to Find</h3>
+                <div className="w-[30px] h-[2.5px] bg-[#6B46C1] rounded-full"></div>
+              </div>
+              <div className="flex flex-col">
+                {[
+                  { icon: Home, label: "Studio Space", path: "/studios" },
+                  { icon: Video, label: "Videographer", path: "/professionals?type=videographer" },
+                  { icon: Clapperboard, label: "Video Editor", path: "/professionals?type=editor" },
+                  { icon: Briefcase, label: "Casting Equipment", path: "/equipment" },
+                ].map((item, idx) => (
+                  <div key={item.label} onClick={() => navigateTo(item.path)} className={`group/item flex items-center justify-between py-[18px] ${idx !== 3 ? 'border-b border-[#F3F4F6]' : ''} cursor-pointer hover:bg-gray-50/50 transition-colors -mx-3 px-3 rounded-[12px]`}>
+                    <div className="flex items-center gap-[16px]">
+                      <div className="w-[44px] h-[44px] rounded-[10px] bg-[#EBE4FF] flex items-center justify-center shrink-0">
+                        <item.icon className="w-[20px] h-[20px] text-[#6B46C1] stroke-[2.5]" />
                       </div>
-                      <span className="text-xl font-semibold text-[#0A0A1A]">{item.label}</span>
+                      <span className="font-manrope font-[800] text-[17px] text-[#000000] tracking-tight">{item.label}</span>
                     </div>
-                  ))}
-                </div>
+                    <div className="w-[28px] h-[28px] rounded-full bg-[#F3E8FF] flex items-center justify-center group-hover/item:bg-[#6B46C1] transition-colors">
+                      <ArrowRight className="w-[14px] h-[14px] text-[#6B46C1] group-hover/item:text-white transition-colors stroke-[2.5]" />
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
-            {/* Card 2: I Want to List */}
-            <div className="group relative bg-[#F8F8FC] p-12 rounded-[2.5rem] overflow-hidden border border-[#006576]/5 hover:scale-[1.02] transition-all duration-500 hover:shadow-2xl hover:shadow-[#006576]/10">
-              <div className="relative z-10">
-                <h3 className="font-newsreader text-5xl font-bold text-[#000000] mb-8">I Want to List</h3>
-                <div className="space-y-6">
-                  {[
-                    { icon: "add_business", label: "Studio", path: "/register/list-studio" },
-                    { icon: "person_add", label: "List as Videographer", path: "/professionals/register?type=videographer" },
-                    { icon: "edit_square", label: "List as Video Editor", path: "/professionals/register?type=editor" },
-                    { icon: "inventory_2", label: "Rent my Equipment", path: "/register/list-equipment" },
-                  ].map((item) => (
-                    <div key={item.label} onClick={() => navigateTo(item.path)} className="flex items-center gap-6 p-4 rounded-2xl hover:bg-white transition-colors cursor-pointer">
-                      <div className="w-14 h-14 rounded-2xl bg-[#65e1ff] flex items-center justify-center text-[#006576]">
-                        <span className="material-symbols-outlined">{item.icon}</span>
+            )}
+
+            {/* Card 2: I Want to List — shown to guests and studio owners */}
+            {(!user || profile?.role === 'studio_owner') && (
+            <div className="w-full max-w-[420px] bg-[#FFFFFF] rounded-[24px] p-[32px] shadow-[0_4px_24px_rgba(0,0,0,0.04)] border border-[#F3F4F6]">
+              <div className="mb-[24px]">
+                <h3 className="font-newsreader italic text-[28px] font-bold text-[#0A0A1A] mb-[12px]">I Want to List</h3>
+                <div className="w-[30px] h-[2.5px] bg-[#2D9B87] rounded-full"></div>
+              </div>
+              <div className="flex flex-col">
+                {[
+                  { icon: Home, label: "Studio", path: "/register/list-studio" },
+                  { icon: Video, label: "List as Videographer", path: "/professionals/register?type=videographer" },
+                  { icon: Clapperboard, label: "List as Video Editor", path: "/professionals/register?type=editor" },
+                  { icon: Briefcase, label: "Rent my Equipment", path: "/register/list-equipment" },
+                ].map((item, idx) => (
+                  <div key={item.label} onClick={() => navigateTo(item.path)} className={`group/item flex items-center justify-between py-[18px] ${idx !== 3 ? 'border-b border-[#F3F4F6]' : ''} cursor-pointer hover:bg-gray-50/50 transition-colors -mx-3 px-3 rounded-[12px]`}>
+                    <div className="flex items-center gap-[16px]">
+                      <div className="w-[44px] h-[44px] rounded-[10px] bg-[#E6F8F5] flex items-center justify-center shrink-0">
+                        <item.icon className="w-[20px] h-[20px] text-[#2D9B87] stroke-[2.5]" />
                       </div>
-                      <span className="text-xl font-semibold text-[#0A0A1A]">{item.label}</span>
+                      <span className="font-manrope font-[800] text-[17px] text-[#000000] tracking-tight">{item.label}</span>
                     </div>
-                  ))}
+                    <div className="w-[28px] h-[28px] rounded-full bg-[#E6F8F5] flex items-center justify-center group-hover/item:bg-[#2D9B87] transition-colors">
+                      <ArrowRight className="w-[14px] h-[14px] text-[#2D9B87] group-hover/item:text-white transition-colors stroke-[2.5]" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            )}
+
+          </div>
+        </div>
+      </section>
+
+      {/* ═══ FIND THE BEST STUDIO SPACES (REDESIGNED ABOUT US - COMPACT & HIGH CONTRAST) ═══ */}
+      <section className="relative py-12 px-6 md:px-10 overflow-hidden" id="find-best-studios">
+        <div className="max-w-[1100px] mx-auto">
+          
+          {/* Top Row: Stats (More Compact) */}
+          <div className="flex flex-wrap items-center justify-between gap-6 mb-12 bg-white/60 backdrop-blur-md rounded-[24px] p-6 md:p-8 border border-white/80 shadow-sm">
+            {[
+              { icon: Users, val: "+50", unit: "K", label: "Creators" },
+              { icon: Building2, val: "+12", unit: "K", label: "Studios" },
+              { icon: Smile, val: "98", unit: "%", label: "Satisfaction" },
+              { icon: CalendarDays, val: "+20", unit: "K", label: "Bookings" },
+            ].map((stat, i) => (
+              <div key={i} className="flex flex-row items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-[#EBE4FF] flex items-center justify-center shrink-0">
+                  <stat.icon className="w-5 h-5 text-[#6B46C1]" />
+                </div>
+                <div className="flex flex-col">
+                  <div className="font-bold text-[28px] md:text-[32px] tracking-tight leading-none" style={{ fontFamily: '"Newsreader", serif' }}>
+                    <span className="text-[#000000]">{stat.val}</span>
+                    <span className="text-[#6B46C1] text-[18px] md:text-[20px] ml-0.5">{stat.unit}</span>
+                  </div>
+                  <p className="font-manrope font-black text-[13px] text-[#000000]/60 uppercase tracking-widest mt-1">{stat.label}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Grid Layout: Image Left, Text Right (Compact) */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+            
+            {/* Left Column: User Provided Image */}
+            <div className="relative group">
+              <div className="absolute -inset-2 bg-gradient-to-br from-[#7C3AED]/10 to-[#06B6D4]/10 blur-xl opacity-50" />
+              <div className="relative rounded-[32px] overflow-hidden shadow-xl border-2 border-white">
+                <img 
+                  src="/studio-shoot.jpg" 
+                  alt="Studio Shoot" 
+                  className="w-full h-[480px] object-cover transition-transform duration-700 group-hover:scale-105"
+                />
+              </div>
+            </div>
+
+            {/* Right Column: About Us Content (High Contrast) */}
+            <div className="space-y-8">
+              <div className="space-y-3">
+                <h3 className="font-newsreader text-[44px] md:text-[56px] font-bold text-[#000000] leading-tight ml-2">About Us</h3>
+                {/* Creative Separator */}
+                <div className="flex items-center gap-3 ml-2">
+                  <div className="w-12 h-[2px] bg-[#6B46C1]"></div>
+                  <Sparkles className="w-5 h-5 text-[#6B46C1] fill-[#6B46C1]/10" />
+                  <div className="w-24 h-[2px] bg-[#6B46C1]/30"></div>
+                </div>
+              </div>
+              
+              <div className="bg-white/80 backdrop-blur-md rounded-[32px] p-8 md:p-10 border border-white shadow-[0_20px_50px_rgba(0,0,0,0.04)] space-y-8">
+                <p className="text-[18px] md:text-[20px] text-[#000000] font-bold leading-relaxed">
+                  CreatorsBNB is a marketplace where Creators and Brands find the best ecosystem for the Brand and Content Shoots.
+                </p>
+
+                <div className="space-y-6">
+                  <h4 className="text-[18px] font-black text-[#4C1D95] uppercase tracking-[2px]" style={{ fontFamily: '"Manrope", sans-serif' }}>WHY CHOOSE US</h4>
+                  
+                  <div className="space-y-6">
+                    {[
+                      { title: "Find premium Studios in one Click", desc: "Access elite creative spaces instantly.", icon: <Sparkles className="w-4 h-4" /> },
+                      { title: "Find the best Videographers and Editors", desc: "Connect with verified professionals in town.", icon: <Rocket className="w-4 h-4" /> },
+                      { title: "Transparent pricing with no hidden costs", desc: "Honest booking without any surprises.", icon: <Smile className="w-4 h-4" /> },
+                    ].map((item, i) => (
+                      <div key={i} className="flex items-start gap-5 group">
+                        <div className="w-11 h-11 rounded-2xl bg-[#EBE4FF] border border-[#EBE4FF] flex items-center justify-center shrink-0 text-[#6B46C1] group-hover:bg-[#6B46C1] group-hover:text-white transition-all duration-300">
+                          {item.icon}
+                        </div>
+                        <div className="space-y-1">
+                          <p className="text-[17px] font-black text-[#000000] group-hover:text-[#6B46C1] transition-colors">{item.title}</p>
+                          <p className="text-[15px] text-[#000000]/70 font-bold leading-snug">{item.desc}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="pt-4">
+                  <button 
+                    onClick={() => navigateTo('/studios')}
+                    className="w-full md:w-auto px-10 py-4 rounded-full bg-[#000000] text-white font-black text-[15px] hover:bg-[#6B46C1] hover:shadow-[0_15px_30px_rgba(107,70,193,0.3)] transition-all"
+                  >
+                    Explore Marketplace
+                  </button>
                 </div>
               </div>
             </div>
           </div>
+
         </div>
       </section>
 

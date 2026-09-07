@@ -3,6 +3,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { getCreatorBookings } from "@/services/supabase-service";
 import { CalendarDays, Clock, MapPin } from "lucide-react";
+import Logo from "@/components/Logo";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const statusColors: Record<string, string> = {
@@ -18,7 +19,15 @@ const CreatorDashboard = () => {
   const [bookings, setBookings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => { if (!user) return; getCreatorBookings(user.id).then(({ data }) => { setBookings(data || []); setLoading(false); }); }, [user]);
+  useEffect(() => {
+    if (!user) return;
+    const timeout = setTimeout(() => { setLoading(false); }, 5000);
+    getCreatorBookings(user.id).then(({ data }) => {
+      clearTimeout(timeout);
+      setBookings(data || []);
+      setLoading(false);
+    }).catch(() => { clearTimeout(timeout); setLoading(false); });
+  }, [user]);
   const handleSignOut = async () => { await signOut(); navigate("/"); };
 
   return (
@@ -26,12 +35,12 @@ const CreatorDashboard = () => {
       <div className="absolute -top-32 -right-32 w-[500px] h-[500px] rounded-full bg-[#7C3AED]/10 blur-[120px] pointer-events-none" />
       <div className="absolute -bottom-32 -left-32 w-[400px] h-[400px] rounded-full bg-[#06B6D4]/8 blur-[120px] pointer-events-none" />
 
-      <header className="sticky top-0 z-50 bg-[rgba(226,226,228,0.92)] backdrop-blur-xl border-b border-[rgba(0,0,0,0.06)] px-8 py-5 flex justify-between items-center">
-        <a href="/" className="font-newsreader italic text-2xl font-bold text-[#0A0A1A]">CreatorsBNB</a>
-        <div className="flex items-center gap-6">
-          <div className="text-right"><p className="text-sm font-bold text-[#0A0A1A]">{profile?.full_name}</p><p className="text-xs text-[#9CA3AF]">Creator</p></div>
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#7C3AED] to-[#06B6D4] flex items-center justify-center text-white font-bold text-sm">{profile?.full_name?.charAt(0)?.toUpperCase() || "C"}</div>
-          <button onClick={handleSignOut} className="text-sm text-[#9CA3AF] hover:text-red-500 transition-colors font-medium">Sign Out</button>
+      <header className="sticky top-0 z-50 bg-[rgba(226,226,228,0.92)] backdrop-blur-xl border-b border-[rgba(0,0,0,0.06)] px-12 py-5 h-[80px] flex justify-between items-center">
+        <Logo />
+        <div className="flex items-center gap-8 shrink-0">
+          <div className="text-right"><p className="text-sm font-bold text-[#0A0A1A] whitespace-nowrap">{profile?.full_name}</p><p className="text-xs text-[#9CA3AF] whitespace-nowrap">Creator</p></div>
+          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#7C3AED] to-[#06B6D4] flex items-center justify-center text-white font-bold text-sm shrink-0">{profile?.full_name?.charAt(0)?.toUpperCase() || "C"}</div>
+          <button onClick={handleSignOut} className="text-[20px] text-[#9CA3AF] hover:text-red-500 transition-colors font-medium whitespace-nowrap">Sign Out</button>
         </div>
       </header>
 

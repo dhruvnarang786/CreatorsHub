@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext'
+import Logo from '@/components/Logo'
 
 const SignIn = () => {
   const { signIn, profile } = useAuth()
@@ -25,15 +26,7 @@ const SignIn = () => {
     if (authError) {
       setError(authError.message)
     } else {
-      // Redirect based on role — small delay to allow profile fetch
-      setTimeout(() => {
-        const role = profile?.role
-        if (role === 'studio_owner') {
-          navigate('/dashboard/owner')
-        } else {
-          navigate('/dashboard/creator')
-        }
-      }, 500)
+      navigate('/')
     }
   }
 
@@ -48,9 +41,9 @@ const SignIn = () => {
       <div className="relative z-10 max-w-[520px] w-full bg-white border border-[rgba(124,58,237,0.12)] rounded-3xl p-12 shadow-[0_20px_60px_rgba(124,58,237,0.08),0_4px_20px_rgba(0,0,0,0.06)]">
         {/* Header */}
         <div className="text-center space-y-3 mb-8">
-          <Link to="/" className="font-newsreader italic text-3xl font-bold text-[#0A0A1A] logo-shimmer inline-block">
-            CreatorsBNB
-          </Link>
+          <div className="flex justify-center mb-2">
+            <Logo size="lg" />
+          </div>
           <h1 className="text-2xl font-bold text-[#0A0A1A]" style={{ fontFamily: '"Newsreader", serif' }}>Welcome back</h1>
           <p className="text-[#6B7280] text-sm">Sign in to your account</p>
         </div>
