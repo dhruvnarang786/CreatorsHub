@@ -22,7 +22,7 @@ const Logo = ({ className = "", size = "md" }: LogoProps) => {
       style={{ fontFamily: '"Manrope", sans-serif' }}
     >
       <span className="text-[#0A0A1A]">Creators</span>
-      <span className="text-[#7C3AED]">BNB</span>
+      <span className="text-[#7C3AED]">Hub</span>
     </div>
   );
 };

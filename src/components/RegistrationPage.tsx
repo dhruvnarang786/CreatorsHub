@@ -409,7 +409,7 @@ const RegistrationPage = ({ mode, onBack }: RegistrationPageProps) => {
                   required 
                 />
                 <label htmlFor="declaration" className="text-[13px] text-[#333] leading-relaxed font-medium">
-                  <strong>Declaration:</strong> I agree to CreatorsBNB Terms and conditions. I understand that all bookings must be made via the platform only.
+                  <strong>Declaration:</strong> I agree to CreatorsHub Terms and conditions. I understand that all bookings must be made via the platform only.
                 </label>
               </div>
 

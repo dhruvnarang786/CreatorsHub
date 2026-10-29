@@ -15,7 +15,7 @@ export const sendAdminNotification = async (studioName: string, ownerName: strin
         Authorization: `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: "CreatorsBNB <notifications@creatorsbnb.com>",
+        from: "CreatorsHub <notifications@creatorshub.com>",
         to: ADMIN_EMAIL,
         subject: `🚨 New Studio Alert: ${studioName}`,
         html: `
@@ -28,7 +28,7 @@ export const sendAdminNotification = async (studioName: string, ownerName: strin
               <p><strong>City:</strong> ${city}</p>
             </div>
             <a href="${window.location.origin}/admin/approvals" style="display: inline-block; background: #7C3AED; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold;">Review & Approve Now</a>
-            <p style="font-size: 12px; color: #999; margin-top: 20px;">© 2024 CreatorsBNB Admin Team</p>
+            <p style="font-size: 12px; color: #999; margin-top: 20px;">© 2024 CreatorsHub Admin Team</p>
           </div>
         `,
       }),
@@ -50,19 +50,19 @@ export const sendOwnerApprovalEmail = async (ownerEmail: string, ownerName: stri
         Authorization: `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: "CreatorsBNB <hello@creatorsbnb.com>",
+        from: "CreatorsHub <hello@creatorshub.com>",
         to: ownerEmail,
-        subject: `✨ Your Studio is Live on CreatorsBNB!`,
+        subject: `✨ Your Studio is Live on CreatorsHub!`,
         html: `
           <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 20px;">
             <h2 style="color: #7C3AED;">Congratulations, ${ownerName}!</h2>
-            <p>We've reviewed your listing and we're excited to let you know that <strong>${studioName}</strong> is now LIVE on the CreatorsBNB marketplace.</p>
+            <p>We've reviewed your listing and we're excited to let you know that <strong>${studioName}</strong> is now LIVE on the CreatorsHub marketplace.</p>
             <p>Creators can now discover and book your space.</p>
             <div style="margin: 30px 0; text-align: center;">
               <a href="${window.location.origin}/dashboard/owner" style="display: inline-block; background: #0A0A1A; color: white; padding: 14px 28px; border-radius: 30px; text-decoration: none; font-weight: bold;">View Your Dashboard</a>
             </div>
             <p>Happy Shoots!</p>
-            <p style="font-size: 12px; color: #999; margin-top: 20px;">The CreatorsBNB Team</p>
+            <p style="font-size: 12px; color: #999; margin-top: 20px;">The CreatorsHub Team</p>
           </div>
         `,
       }),
@@ -98,7 +98,7 @@ export const sendBookingStatusUpdateEmail = async (
         Authorization: `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: "CreatorsBNB <hello@creatorsbnb.com>",
+        from: "CreatorsHub <hello@creatorshub.com>",
         to: creatorEmail,
         subject: subject,
         html: `
@@ -113,7 +113,7 @@ export const sendBookingStatusUpdateEmail = async (
                 window.location.origin
               }/dashboard/creator" style="display: inline-block; background: #0A0A1A; color: white; padding: 14px 28px; border-radius: 30px; text-decoration: none; font-weight: bold;">View Your Dashboard</a>
             </div>
-            <p style="font-size: 12px; color: #999; margin-top: 20px;">The CreatorsBNB Team</p>
+            <p style="font-size: 12px; color: #999; margin-top: 20px;">The CreatorsHub Team</p>
           </div>
         `,
       }),

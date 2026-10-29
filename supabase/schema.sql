@@ -1,5 +1,5 @@
 -- ═══════════════════════════════════════════════════════
--- CreatorsBNB — Full Database Schema
+-- CreatorsHub — Full Database Schema
 -- Run this entire file in Supabase SQL Editor (Dashboard → SQL Editor)
 -- ═══════════════════════════════════════════════════════
 

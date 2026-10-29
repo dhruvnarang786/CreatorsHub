@@ -41,56 +41,13 @@ html {
 }
 
 body {
-  background-color: #E2E2E4 !important;
+  background-color: #F8F9FA !important;
+  background-image: url('/bg.png'); /* The new image will go here */
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
   position: relative;
-}
-
-/* Global sparkle texture (always present — matches homepage) */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  background: url('/silver-sparkle-bg.png') center center / cover no-repeat fixed;
-  opacity: 0.6;
-}
-
-/* Global bokeh glow blobs */
-body::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  background:
-    radial-gradient(ellipse 400px 400px at 20% 25%, rgba(255,255,255,0.5) 0%, transparent 65%),
-    radial-gradient(ellipse 350px 300px at 75% 20%, rgba(255,255,255,0.4) 0%, transparent 60%),
-    radial-gradient(ellipse 500px 400px at 50% 55%, rgba(255,255,255,0.35) 0%, transparent 55%),
-    radial-gradient(ellipse 300px 300px at 85% 80%, rgba(255,255,255,0.4) 0%, transparent 60%),
-    radial-gradient(ellipse 350px 300px at 10% 75%, rgba(255,255,255,0.35) 0%, transparent 60%);
-  animation: bokehPulse 8s ease-in-out infinite alternate;
-}
-
-/* Global diagonal sweep shine (same as homepage) */
-#root::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background: linear-gradient(
-    115deg,
-    transparent 0%,
-    transparent 30%,
-    rgba(255,255,255,0.12) 42%,
-    rgba(255,255,255,0.25) 50%,
-    rgba(255,255,255,0.12) 58%,
-    transparent 70%,
-    transparent 100%
-  );
-  background-size: 200% 100%;
-  pointer-events: none;
-  z-index: 0;
-  animation: shimmerSweep 5s ease-in-out infinite;
 }
 
 @layer base {
@@ -203,57 +160,30 @@ body::after {
   animation: shimmer 1.5s linear infinite;
 }
 
-/* ═══ Silver Shimmer Background — Real Sparkle Texture ═══ */
+/* ═══ Silver Shimmer Background — New Bokeh Background ═══ */
 .silver-shimmer-bg {
-  background-color: #E2E2E4;
+  background-image: url('/bg.png') !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-attachment: fixed !important;
+  background-repeat: no-repeat !important;
+  background-color: #F0F0F0;
   position: relative;
 }
 
-/* Layer 1: Actual silver sparkle texture image */
+/* Layer 1: Removed old sparkle texture — using new image instead */
 .silver-sparkle-noise {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  background: url('/silver-sparkle-bg.png') center center / cover no-repeat fixed;
-  opacity: 0.45;
+  display: none;
 }
 
-/* Layer 2: Soft bokeh glow blobs for depth */
+/* Layer 2: Soft bokeh glow blobs — removed */
 .silver-shimmer-bg::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background:
-    radial-gradient(ellipse 400px 400px at 20% 25%, rgba(255,255,255,0.5) 0%, transparent 65%),
-    radial-gradient(ellipse 350px 300px at 75% 20%, rgba(255,255,255,0.4) 0%, transparent 60%),
-    radial-gradient(ellipse 500px 400px at 50% 55%, rgba(255,255,255,0.35) 0%, transparent 55%),
-    radial-gradient(ellipse 300px 300px at 85% 80%, rgba(255,255,255,0.4) 0%, transparent 60%),
-    radial-gradient(ellipse 350px 300px at 10% 75%, rgba(255,255,255,0.35) 0%, transparent 60%);
-  pointer-events: none;
-  z-index: 0;
-  animation: bokehPulse 8s ease-in-out infinite alternate;
+  display: none;
 }
 
-/* Layer 3: Sweeping diagonal shine animation */
+/* Layer 3: Sweeping diagonal shine — removed */
 .silver-shimmer-bg::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background: linear-gradient(
-    115deg,
-    transparent 0%,
-    transparent 30%,
-    rgba(255,255,255,0.12) 42%,
-    rgba(255,255,255,0.25) 50%,
-    rgba(255,255,255,0.12) 58%,
-    transparent 70%,
-    transparent 100%
-  );
-  background-size: 200% 100%;
-  pointer-events: none;
-  z-index: 0;
-  animation: shimmerSweep 5s ease-in-out infinite;
+  display: none;
 }
 
 @keyframes bokehPulse {
@@ -267,15 +197,26 @@ body::after {
   100% { background-position: -200% 0; }
 }
 
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(calc(-50% - 16px)); }
+}
+
 /* ═══ Showcase Gallery (6-Shape Horizontal Line Layout) ═══ */
 .showcase-gallery {
   display: flex;
   flex-direction: row;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
   gap: 32px;
   padding: 10px 0;
   flex-wrap: nowrap;
+  width: max-content;
+  animation: marquee 30s linear infinite;
+}
+
+.showcase-gallery:hover {
+  animation-play-state: paused;
 }
 
 /* All shapes */
@@ -359,9 +300,7 @@ body::after {
 @media (max-width: 1024px) {
   .showcase-gallery {
     gap: 15px;
-    overflow-x: auto;
-    justify-content: flex-start;
-    padding: 20px;
+    padding: 20px 0;
   }
   .showcase-shape {
     width: 160px;

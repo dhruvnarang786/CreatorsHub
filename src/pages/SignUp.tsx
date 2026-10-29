@@ -163,7 +163,7 @@ const SignUp = () => {
           <label className="flex items-start gap-3 cursor-pointer group">
             <input type="checkbox" checked={agreedToTerms} onChange={(e) => setAgreedToTerms(e.target.checked)} className="mt-1 w-5 h-5 rounded border-[#E5E7EB] bg-white text-[#7C3AED] focus:ring-[#7C3AED] focus:ring-offset-0 cursor-pointer accent-[#7C3AED]" />
             <span className="text-[#6B7280] text-sm group-hover:text-[#374151] transition-colors">
-              I agree to CreatorsBNB's{' '}
+              I agree to CreatorsHub's{' '}
               <a href="#" className="text-[#7C3AED] hover:underline">Terms of Service</a>{' '}
               and{' '}
               <a href="#" className="text-[#7C3AED] hover:underline">Privacy Policy</a>

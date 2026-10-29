@@ -50,7 +50,7 @@ const ForgotPassword = () => {
 
       <div className="relative z-10 max-w-[520px] w-full bg-white border border-[rgba(124,58,237,0.12)] rounded-3xl p-12 shadow-[0_20px_60px_rgba(124,58,237,0.08),0_4px_20px_rgba(0,0,0,0.06)]">
         <div className="text-center space-y-3 mb-8">
-          <Link to="/" className="font-newsreader italic text-3xl font-bold text-[#0A0A1A] logo-shimmer inline-block">CreatorsBNB</Link>
+          <Link to="/" className="font-newsreader italic text-3xl font-bold text-[#0A0A1A] logo-shimmer inline-block">CreatorsHub</Link>
           <h1 className="text-2xl font-bold text-[#0A0A1A]" style={{ fontFamily: '"Newsreader", serif' }}>Reset your password</h1>
           <p className="text-[#6B7280] text-sm">Enter your email and we'll send you a reset link</p>
         </div>

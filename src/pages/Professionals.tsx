@@ -33,7 +33,7 @@ const Professionals = () => {
       <div className="absolute -bottom-32 -left-32 w-[400px] h-[400px] rounded-full bg-[#06B6D4]/8 blur-[120px] pointer-events-none" />
 
       <nav className="sticky top-0 z-50 bg-[rgba(226,226,228,0.92)] backdrop-blur-xl border-b border-[rgba(0,0,0,0.06)] px-6 md:px-12 h-[72px] flex items-center justify-between">
-        <a href="/" className="font-newsreader italic text-2xl font-bold text-[#0A0A1A]">CreatorsBNB</a>
+        <a href="/" className="font-newsreader italic text-2xl font-bold text-[#0A0A1A]">CreatorsHub</a>
         <div className="flex gap-4">
           {user ? (
             <div className="flex items-center gap-3">

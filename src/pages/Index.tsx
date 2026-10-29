@@ -284,17 +284,19 @@ const Index = () => {
       <section className="relative min-h-screen pt-[90px] pb-10 px-6 md:px-12 flex flex-col items-center overflow-visible" id="hero">
         
         {/* 1. Shapes (Full Width, Top) */}
-        <div className="showcase-gallery z-10 w-full mb-8 overflow-x-auto md:overflow-visible">
-          {SHOWCASE_VIDEOS.map((src, idx) => (
-            <div key={idx} className="showcase-shape">
-              <div className={`gradient-fill ${SHAPE_GRADIENTS[idx]}`} />
-              {src && (
-                <video autoPlay className="w-full h-full object-cover" loop muted playsInline>
-                  <source src={src} type="video/mp4" />
-                </video>
-              )}
-            </div>
-          ))}
+        <div className="w-full overflow-hidden mb-8 z-10 py-4">
+          <div className="showcase-gallery">
+            {[...SHOWCASE_VIDEOS, ...SHOWCASE_VIDEOS].map((src, idx) => (
+              <div key={idx} className="showcase-shape shrink-0 relative group">
+                <div className={`gradient-fill ${SHAPE_GRADIENTS[idx % SHAPE_GRADIENTS.length]}`} />
+                {src && (
+                  <video autoPlay className="absolute inset-0 w-full h-full object-cover rounded-[32px]" loop muted playsInline>
+                    <source src={src} type="video/mp4" />
+                  </video>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* 2. Content Container (Two Column Layout Below Shapes) */}
@@ -306,7 +308,7 @@ const Index = () => {
               #Built for creators and brands
             </div>
             <h1 className="text-[48px] md:text-[58px] lg:text-[64px] font-bold text-[#0A0A1A] leading-[1.1] tracking-tight mb-6" style={{ fontFamily: '"Newsreader", serif' }}>
-              Elevate your content game with <span className="italic">CreatorsBNB</span>
+              Elevate your content game with <span className="italic">CreatorsHub</span>
             </h1>
           </div>
 
@@ -522,7 +524,7 @@ const Index = () => {
               
               <div className="bg-white/80 backdrop-blur-md rounded-[32px] p-8 md:p-10 border border-white shadow-[0_20px_50px_rgba(0,0,0,0.04)] space-y-8">
                 <p className="text-[18px] md:text-[20px] text-[#000000] font-bold leading-relaxed">
-                  CreatorsBNB is a marketplace where Creators and Brands find the best ecosystem for the Brand and Content Shoots.
+                  CreatorsHub is a marketplace where Creators and Brands find the best ecosystem for the Brand and Content Shoots.
                 </p>
 
                 <div className="space-y-6">
@@ -646,7 +648,7 @@ const Index = () => {
       <footer id="footer" className="w-full py-20 px-6 md:px-12 mt-20 bg-[#07070E] text-white" style={{ borderTop: '2px solid transparent', borderImage: 'linear-gradient(to right, #702ae1, #06B6D4, #b00d6a) 1' }}>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 max-w-7xl mx-auto">
           <div className="space-y-6">
-            <div className="font-newsreader text-2xl font-black text-white">CreatorsBNB</div>
+            <div className="font-newsreader text-2xl font-black text-white">CreatorsHub</div>
             <p className="text-gray-400 text-sm leading-relaxed">The premier destination for creative minds to find and book unique studio spaces worldwide.</p>
           </div>
           <div className="space-y-6">
@@ -680,7 +682,7 @@ const Index = () => {
           </div>
         </div>
         <div className="max-w-7xl mx-auto pt-20 border-t border-gray-800 text-center text-xs text-gray-500 uppercase tracking-widest">
-          © 2024 CreatorsBNB. Kinetic Energy for the Digital Native.
+          © 2024 CreatorsHub. Kinetic Energy for the Digital Native.
         </div>
       </footer>
     </div>

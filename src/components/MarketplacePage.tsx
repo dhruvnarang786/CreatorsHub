@@ -88,7 +88,7 @@ const MarketplacePage = ({ category, onBack }: MarketplacePageProps) => {
       <div className="absolute -bottom-32 -left-32 w-[400px] h-[400px] rounded-full bg-[#06B6D4]/8 blur-[120px] pointer-events-none" />
 
       <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur-xl border-b border-[rgba(124,58,237,0.08)] px-10 md:px-16 h-[80px] flex items-center justify-between">
-        <a href="/" className="font-newsreader italic text-[26px] font-bold text-[#0A0A1A] shrink-0">CreatorsBNB</a>
+        <a href="/" className="font-newsreader italic text-[26px] font-bold text-[#0A0A1A] shrink-0">CreatorsHub</a>
         <div className="flex gap-8 shrink-0">
           <button onClick={() => navigate("/signin")} className="text-[20px] font-bold text-[#0A0A1A] hover:text-[#7C3AED] transition-colors whitespace-nowrap">Sign In</button>
           <button onClick={() => navigate("/signup")} className="px-8 py-3 rounded-full bg-gradient-to-r from-[#7C3AED] to-[#06B6D4] text-white text-[20px] font-bold hover:shadow-[0_8px_20px_rgba(124,58,237,0.3)] transition-all whitespace-nowrap">Sign Up</button>
