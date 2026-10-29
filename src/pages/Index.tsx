@@ -290,7 +290,15 @@ const Index = () => {
               <div key={idx} className="showcase-shape shrink-0 relative group">
                 <div className={`gradient-fill ${SHAPE_GRADIENTS[idx % SHAPE_GRADIENTS.length]}`} />
                 {src && (
-                  <video autoPlay className="absolute inset-0 w-full h-full object-cover rounded-[32px]" loop muted playsInline>
+                  <video
+                    autoPlay
+                    className="absolute inset-0 w-full h-full object-cover rounded-[32px]"
+                    loop
+                    muted
+                    playsInline
+                    preload="none"
+                    onCanPlay={(e) => (e.currentTarget as HTMLVideoElement).play()}
+                  >
                     <source src={src} type="video/mp4" />
                   </video>
                 )}
